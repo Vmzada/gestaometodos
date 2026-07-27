@@ -49,7 +49,7 @@ export async function updateSession(request: NextRequest) {
 
     if (!hasActiveSubscription(profile)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/assinatura";
+      url.pathname = "/demo";
       return NextResponse.redirect(url);
     }
   }
