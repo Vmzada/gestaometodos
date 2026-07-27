@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { Logo } from "@/components/ui/logo";
 
 const FEATURES = [
   {
@@ -32,7 +33,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-neutral-950">
       <header className="sticky top-0 z-20 border-b border-white/5 bg-neutral-950/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-semibold tracking-tight text-neutral-100">Gestão dos Métodos</span>
+          <Logo />
           <div className="flex gap-3">
             <Link href="/login">
               <Button variant="ghost">Entrar</Button>

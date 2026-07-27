@@ -3,7 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/database.types";
 import { hasActiveSubscription } from "@/lib/subscription";
 
-const PUBLIC_PATHS = ["/", "/login", "/cadastro", "/verifique-seu-email", "/auth/callback"];
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/cadastro",
+  "/verifique-seu-email",
+  "/auth/callback",
+  "/esqueci-senha",
+  "/redefinir-senha",
+];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

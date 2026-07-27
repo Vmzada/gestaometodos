@@ -6,6 +6,7 @@ import { signIn } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
@@ -20,14 +21,13 @@ export default function LoginPage() {
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
         <div>
-          <Label htmlFor="password">Senha</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-          />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Senha</Label>
+            <Link href="/esqueci-senha" className="mb-1 text-xs text-emerald-400 hover:underline">
+              Esqueci minha senha
+            </Link>
+          </div>
+          <PasswordInput id="password" name="password" autoComplete="current-password" required />
         </div>
         {state.error && <p className="text-sm text-red-400">{state.error}</p>}
         <Button type="submit" className="w-full" disabled={pending}>
