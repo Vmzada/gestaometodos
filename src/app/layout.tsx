@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StakeFlow — Gestão financeira para método em casas de apostas",
+  title: "Gestão dos Métodos — Gestão financeira para método em casas de apostas",
   description:
     "Painel de gestão financeira para quem trabalha com método em casas de apostas: lançamentos, totais e calendário.",
 };

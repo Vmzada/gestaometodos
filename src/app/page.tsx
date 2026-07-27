@@ -32,7 +32,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-neutral-950">
       <header className="sticky top-0 z-20 border-b border-white/5 bg-neutral-950/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-semibold tracking-tight text-neutral-100">StakeFlow</span>
+          <span className="text-lg font-semibold tracking-tight text-neutral-100">Gestão dos Métodos</span>
           <div className="flex gap-3">
             <Link href="/login">
               <Button variant="ghost">Entrar</Button>
@@ -130,7 +130,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-white/5 px-6 py-6 text-center text-xs text-neutral-600">
-        © {new Date().getFullYear()} StakeFlow
+        © {new Date().getFullYear()} Gestão dos Métodos
       </footer>
     </div>
   );

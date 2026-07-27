@@ -1,4 +1,4 @@
-# StakeFlow
+# Gestão dos Métodos
 
 Painel de gestão financeira para quem trabalha com método em casas de apostas: lançamentos por
 casa de aposta e cliente, totais de hoje/semana/mês e calendário. Acesso por login (email/senha) e

@@ -17,7 +17,7 @@ export async function POST() {
   try {
     const preApproval = await getPreApprovalClient().create({
       body: {
-        reason: "Assinatura StakeFlow",
+        reason: "Assinatura Gestão dos Métodos",
         external_reference: user.id,
         payer_email: user.email,
         back_url: `${siteUrl}/dashboard`,
