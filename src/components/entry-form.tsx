@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatBRL, todayISO } from "@/lib/date-helpers";
 
-export function EntryForm() {
+export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [deposito, setDeposito] = useState(0);
@@ -15,6 +15,7 @@ export function EntryForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleSubmit(formData: FormData) {
+    if (readOnly) return;
     startTransition(async () => {
       const result = await createEntry({ error: null }, formData);
       if (result.error) {
@@ -34,15 +35,34 @@ export function EntryForm() {
     <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-6">
       <div>
         <Label htmlFor="entry_date">Data</Label>
-        <Input id="entry_date" name="entry_date" type="date" defaultValue={todayISO()} required />
+        <Input
+          id="entry_date"
+          name="entry_date"
+          type="date"
+          defaultValue={todayISO()}
+          disabled={readOnly}
+          required
+        />
       </div>
       <div>
         <Label htmlFor="casa_aposta">Casa de aposta</Label>
-        <Input id="casa_aposta" name="casa_aposta" placeholder="Ex: Bet365" required />
+        <Input
+          id="casa_aposta"
+          name="casa_aposta"
+          placeholder="Ex: Bet365"
+          disabled={readOnly}
+          required
+        />
       </div>
       <div>
         <Label htmlFor="cliente_nome">Cliente</Label>
-        <Input id="cliente_nome" name="cliente_nome" placeholder="Nome do cliente" required />
+        <Input
+          id="cliente_nome"
+          name="cliente_nome"
+          placeholder="Nome do cliente"
+          disabled={readOnly}
+          required
+        />
       </div>
       <div>
         <Label htmlFor="cliente_parte">Parte do cliente (R$)</Label>
@@ -52,6 +72,7 @@ export function EntryForm() {
           type="number"
           step="0.01"
           defaultValue="0"
+          disabled={readOnly}
           required
         />
       </div>
@@ -63,6 +84,7 @@ export function EntryForm() {
           type="number"
           step="0.01"
           defaultValue="0"
+          disabled={readOnly}
           required
           onChange={(e) => setDeposito(Number(e.target.value) || 0)}
         />
@@ -75,6 +97,7 @@ export function EntryForm() {
           type="number"
           step="0.01"
           defaultValue="0"
+          disabled={readOnly}
           required
           onChange={(e) => setSaque(Number(e.target.value) || 0)}
         />
@@ -89,8 +112,8 @@ export function EntryForm() {
       </div>
       <div className="col-span-2 sm:col-span-6">
         {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
-        <Button type="submit" disabled={pending}>
-          {pending ? "Adicionando..." : "Adicionar lançamento"}
+        <Button type="submit" disabled={readOnly || pending}>
+          {readOnly ? "Assine para adicionar" : pending ? "Adicionando..." : "Adicionar lançamento"}
         </Button>
       </div>
     </form>

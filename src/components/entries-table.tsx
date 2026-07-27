@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { formatBRL } from "@/lib/date-helpers";
 import type { Entry } from "@/lib/database.types";
 
-export function EntriesTable({ entries }: { entries: Entry[] }) {
+export function EntriesTable({
+  entries,
+  readOnly = false,
+}: {
+  entries: Entry[];
+  readOnly?: boolean;
+}) {
   if (entries.length === 0) {
     return <p className="text-sm text-neutral-500">Nenhum lançamento neste período.</p>;
   }
@@ -29,7 +35,7 @@ export function EntriesTable({ entries }: { entries: Entry[] }) {
         </thead>
         <tbody>
           {entries.map((entry) => (
-            <EntryRow key={entry.id} entry={entry} />
+            <EntryRow key={entry.id} entry={entry} readOnly={readOnly} />
           ))}
         </tbody>
       </table>
@@ -37,7 +43,7 @@ export function EntriesTable({ entries }: { entries: Entry[] }) {
   );
 }
 
-function EntryRow({ entry }: { entry: Entry }) {
+function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolean }) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deposito, setDeposito] = useState(entry.deposito);
@@ -141,10 +147,10 @@ function EntryRow({ entry }: { entry: Entry }) {
       </td>
       <td className="py-2 pr-3">
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={() => setEditing(true)}>
+          <Button variant="ghost" onClick={() => setEditing(true)} disabled={readOnly}>
             Editar
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button variant="danger" onClick={handleDelete} disabled={readOnly || deleting}>
             {deleting ? "Excluindo..." : "Excluir"}
           </Button>
         </div>
