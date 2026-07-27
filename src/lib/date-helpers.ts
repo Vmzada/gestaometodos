@@ -5,6 +5,12 @@ export function formatBRL(value: number) {
   }).format(value === 0 ? 0 : value); // normalizes -0 so it doesn't render as "-R$ 0,00"
 }
 
+export function daysUntil(isoDateTime: string) {
+  const target = new Date(isoDateTime);
+  const now = new Date();
+  return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export function toISODate(date: Date) {
   const offset = date.getTimezoneOffset();
   const local = new Date(date.getTime() - offset * 60 * 1000);

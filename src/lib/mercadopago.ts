@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, PreApproval } from "mercadopago";
+import { MercadoPagoConfig, Payment, PreApproval } from "mercadopago";
 
 export const PLAN_PRICE_BRL = 14.99;
 
@@ -10,4 +10,8 @@ function getClient() {
 
 export function getPreApprovalClient() {
   return new PreApproval(getClient());
+}
+
+export function getPaymentClient() {
+  return new Payment(getClient());
 }

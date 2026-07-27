@@ -3,8 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { SubscribeButton } from "./subscribe-button";
+import { PixSubscribeButton } from "./pix-subscribe-button";
 import { signOut } from "../(auth)/actions";
 import { Button } from "@/components/ui/button";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 export default async function AssinaturaPage() {
   const supabase = await createClient();
@@ -16,16 +18,16 @@ export default async function AssinaturaPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status")
+    .select("subscription_status, subscription_expires_at")
     .eq("id", user.id)
     .single();
 
-  if (profile?.subscription_status === "active") {
+  if (hasActiveSubscription(profile)) {
     redirect("/dashboard");
   }
 
   return (
-    <div className="bg-mesh relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4">
+    <div className="bg-mesh relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 py-12">
       <div className="bg-grid pointer-events-none absolute inset-0" />
       <TiltCard maxTilt={6} className="relative w-full max-w-sm">
         <Card className="border-emerald-500/20 bg-gradient-to-b from-neutral-900 to-neutral-900/60 text-center shadow-[0_30px_80px_-30px_rgba(16,185,129,0.4)]">
@@ -37,8 +39,26 @@ export default async function AssinaturaPage() {
           <p className="my-6 text-3xl font-bold text-neutral-100">
             R$ 14,99<span className="text-base font-normal text-neutral-400">/mês</span>
           </p>
-          <SubscribeButton />
-          <form action={signOut} className="mt-4">
+
+          <div className="space-y-3 text-left">
+            <SubscribeButton />
+            <p className="text-center text-xs text-neutral-500">
+              Cartão: cobrança automática todo mês.
+            </p>
+
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-neutral-500">ou</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <PixSubscribeButton />
+            <p className="text-center text-xs text-neutral-500">
+              Pix: acesso por 30 dias, renovação manual.
+            </p>
+          </div>
+
+          <form action={signOut} className="mt-6">
             <Button type="submit" variant="ghost" className="w-full">
               Sair
             </Button>

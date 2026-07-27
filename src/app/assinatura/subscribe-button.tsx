@@ -26,7 +26,7 @@ export function SubscribeButton() {
   return (
     <div>
       <Button className="w-full" onClick={handleClick} disabled={loading}>
-        {loading ? "Redirecionando..." : "Assinar por R$ 14,99/mês"}
+        {loading ? "Redirecionando..." : "Assinar com cartão"}
       </Button>
       {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
     </div>

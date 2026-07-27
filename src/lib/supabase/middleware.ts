@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/database.types";
+import { hasActiveSubscription } from "@/lib/subscription";
 
 const PUBLIC_PATHS = ["/", "/login", "/cadastro", "/verifique-seu-email", "/auth/callback"];
 
@@ -42,11 +43,11 @@ export async function updateSession(request: NextRequest) {
   if (user && pathname.startsWith("/dashboard")) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_status")
+      .select("subscription_status, subscription_expires_at")
       .eq("id", user.id)
       .single();
 
-    if (profile?.subscription_status !== "active") {
+    if (!hasActiveSubscription(profile)) {
       const url = request.nextUrl.clone();
       url.pathname = "/assinatura";
       return NextResponse.redirect(url);

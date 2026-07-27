@@ -1,7 +1,8 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPreApprovalClient } from "@/lib/mercadopago";
+import { getPaymentClient, getPreApprovalClient } from "@/lib/mercadopago";
+import { PIX_SUBSCRIPTION_DAYS } from "@/lib/subscription";
 
 // Verifies the x-signature header Mercado Pago sends, per their docs:
 // https://www.mercadopago.com/developers/en/docs/checkout-api/webhooks#editor_2
@@ -28,6 +29,46 @@ function isValidSignature(request: Request, dataId: string) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+async function handleSubscriptionPreapproval(dataId: string) {
+  const preApproval = await getPreApprovalClient().get({ id: dataId });
+  const userId = preApproval.external_reference;
+  if (!userId) return;
+
+  const subscriptionStatus = preApproval.status === "authorized" ? "active" : "inactive";
+
+  const supabase = createAdminClient();
+  await supabase
+    .from("profiles")
+    .update({ subscription_status: subscriptionStatus, mp_subscription_id: dataId })
+    .eq("id", userId);
+}
+
+async function handlePayment(dataId: string) {
+  const payment = await getPaymentClient().get({ id: Number(dataId) });
+  if (payment.status !== "approved") return;
+
+  const userId = payment.external_reference;
+  if (!userId) return;
+
+  const supabase = createAdminClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("subscription_expires_at")
+    .eq("id", userId)
+    .single();
+
+  const currentExpiry = profile?.subscription_expires_at
+    ? new Date(profile.subscription_expires_at)
+    : null;
+  const base = currentExpiry && currentExpiry > new Date() ? currentExpiry : new Date();
+  const newExpiry = new Date(base.getTime() + PIX_SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
+
+  await supabase
+    .from("profiles")
+    .update({ subscription_status: "active", subscription_expires_at: newExpiry.toISOString() })
+    .eq("id", userId);
+}
+
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const body = await request.json().catch(() => null);
@@ -36,7 +77,7 @@ export async function POST(request: Request) {
     url.searchParams.get("data.id") ?? body?.data?.id ?? undefined;
   const type: string | undefined = url.searchParams.get("type") ?? body?.type ?? undefined;
 
-  if (!dataId || type !== "subscription_preapproval") {
+  if (!dataId || (type !== "subscription_preapproval" && type !== "payment")) {
     return NextResponse.json({ received: true });
   }
 
@@ -45,17 +86,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const preApproval = await getPreApprovalClient().get({ id: dataId });
-    const userId = preApproval.external_reference;
-    if (!userId) return NextResponse.json({ received: true });
-
-    const subscriptionStatus = preApproval.status === "authorized" ? "active" : "inactive";
-
-    const supabase = createAdminClient();
-    await supabase
-      .from("profiles")
-      .update({ subscription_status: subscriptionStatus, mp_subscription_id: dataId })
-      .eq("id", userId);
+    if (type === "subscription_preapproval") {
+      await handleSubscriptionPreapproval(dataId);
+    } else {
+      await handlePayment(dataId);
+    }
 
     return NextResponse.json({ received: true });
   } catch (err) {
