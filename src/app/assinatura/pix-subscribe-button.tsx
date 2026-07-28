@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type Step = "form" | "loading" | "qr" | "error";
+type Step = "form" | "loading" | "qr" | "confirmed" | "error";
 
 export function PixSubscribeButton() {
   const router = useRouter();
@@ -42,11 +42,14 @@ export function PixSubscribeButton() {
       setStep("qr");
 
       pollRef.current = setInterval(async () => {
-        const statusRes = await fetch("/api/mercadopago/subscription-status");
+        const statusRes = await fetch(
+          `/api/mercadopago/subscription-status?paymentId=${data.paymentId}`,
+        );
         const statusData = await statusRes.json();
         if (statusData.active) {
           if (pollRef.current) clearInterval(pollRef.current);
-          router.push("/dashboard");
+          setStep("confirmed");
+          setTimeout(() => router.push("/dashboard"), 1500);
         }
       }, 3000);
     } catch (err) {
@@ -59,6 +62,20 @@ export function PixSubscribeButton() {
     await navigator.clipboard.writeText(qrCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (step === "confirmed") {
+    return (
+      <div className="text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="h-7 w-7">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <p className="mt-3 font-medium text-emerald-400">Pagamento confirmado!</p>
+        <p className="mt-1 text-xs text-neutral-400">Liberando sua planilha...</p>
+      </div>
+    );
   }
 
   if (step === "qr") {

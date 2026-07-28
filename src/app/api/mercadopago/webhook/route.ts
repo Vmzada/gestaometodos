@@ -1,8 +1,8 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPaymentClient, getPreApprovalClient } from "@/lib/mercadopago";
-import { PIX_SUBSCRIPTION_DAYS } from "@/lib/subscription";
+import { getPreApprovalClient } from "@/lib/mercadopago";
+import { activatePixPayment } from "@/lib/activate-pix-payment";
 
 // Verifies the x-signature header Mercado Pago sends, per their docs:
 // https://www.mercadopago.com/developers/en/docs/checkout-api/webhooks#editor_2
@@ -43,32 +43,6 @@ async function handleSubscriptionPreapproval(dataId: string) {
     .eq("id", userId);
 }
 
-async function handlePayment(dataId: string) {
-  const payment = await getPaymentClient().get({ id: Number(dataId) });
-  if (payment.status !== "approved") return;
-
-  const userId = payment.external_reference;
-  if (!userId) return;
-
-  const supabase = createAdminClient();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("subscription_expires_at")
-    .eq("id", userId)
-    .single();
-
-  const currentExpiry = profile?.subscription_expires_at
-    ? new Date(profile.subscription_expires_at)
-    : null;
-  const base = currentExpiry && currentExpiry > new Date() ? currentExpiry : new Date();
-  const newExpiry = new Date(base.getTime() + PIX_SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-
-  await supabase
-    .from("profiles")
-    .update({ subscription_status: "active", subscription_expires_at: newExpiry.toISOString() })
-    .eq("id", userId);
-}
-
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const body = await request.json().catch(() => null);
@@ -89,7 +63,7 @@ export async function POST(request: Request) {
     if (type === "subscription_preapproval") {
       await handleSubscriptionPreapproval(dataId);
     } else {
-      await handlePayment(dataId);
+      await activatePixPayment(dataId);
     }
 
     return NextResponse.json({ received: true });
