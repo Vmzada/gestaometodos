@@ -28,7 +28,7 @@ const PLAN_INCLUDES = [
   "Lucro com Delay calculado automaticamente",
   "Dashboard completo com totais em tempo real",
   "Calendário com o histórico de todos os dias",
-  "Pagamento por Pix ou cartão",
+  "Pagamento por Pix",
   "Suporte via WhatsApp",
 ];
 

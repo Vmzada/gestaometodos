@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { TiltCard } from "@/components/ui/tilt-card";
-import { SubscribeButton } from "./subscribe-button";
 import { PixSubscribeButton } from "./pix-subscribe-button";
 import { signOut } from "../(auth)/actions";
 import { Button } from "@/components/ui/button";
@@ -41,17 +40,6 @@ export default async function AssinaturaPage() {
           </p>
 
           <div className="space-y-3 text-left">
-            <SubscribeButton />
-            <p className="text-center text-xs text-neutral-500">
-              Cartão: cobrança automática todo mês.
-            </p>
-
-            <div className="my-4 flex items-center gap-3">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-neutral-500">ou</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-
             <PixSubscribeButton />
             <p className="text-center text-xs text-neutral-500">
               Pix: acesso por 30 dias, renovação manual.

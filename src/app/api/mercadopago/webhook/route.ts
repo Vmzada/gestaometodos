@@ -1,7 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { getPreApprovalClient } from "@/lib/mercadopago";
 import { activatePixPayment } from "@/lib/activate-pix-payment";
 
 // Verifies the x-signature header Mercado Pago sends, per their docs:
@@ -29,20 +27,6 @@ function isValidSignature(request: Request, dataId: string) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-async function handleSubscriptionPreapproval(dataId: string) {
-  const preApproval = await getPreApprovalClient().get({ id: dataId });
-  const userId = preApproval.external_reference;
-  if (!userId) return;
-
-  const subscriptionStatus = preApproval.status === "authorized" ? "active" : "inactive";
-
-  const supabase = createAdminClient();
-  await supabase
-    .from("profiles")
-    .update({ subscription_status: subscriptionStatus, mp_subscription_id: dataId })
-    .eq("id", userId);
-}
-
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const body = await request.json().catch(() => null);
@@ -51,7 +35,7 @@ export async function POST(request: Request) {
     url.searchParams.get("data.id") ?? body?.data?.id ?? undefined;
   const type: string | undefined = url.searchParams.get("type") ?? body?.type ?? undefined;
 
-  if (!dataId || (type !== "subscription_preapproval" && type !== "payment")) {
+  if (!dataId || type !== "payment") {
     return NextResponse.json({ received: true });
   }
 
@@ -60,12 +44,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    if (type === "subscription_preapproval") {
-      await handleSubscriptionPreapproval(dataId);
-    } else {
-      await activatePixPayment(dataId);
-    }
-
+    await activatePixPayment(dataId);
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error("Erro ao processar webhook do Mercado Pago:", err);
