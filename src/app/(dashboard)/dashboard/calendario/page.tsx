@@ -49,21 +49,23 @@ export default async function CalendarioPage({
 
   return (
     <Card>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-2">
         <Link
           href={`/dashboard/calendario?ano=${prev.year}&mes=${prev.month}`}
-          className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
+          className="shrink-0 rounded-md border border-white/10 px-2.5 py-1.5 text-sm text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100 sm:px-3"
         >
-          ← Anterior
+          <span aria-hidden>←</span>
+          <span className="hidden sm:inline"> Anterior</span>
         </Link>
-        <h1 className="text-lg font-semibold text-neutral-100">
+        <h1 className="truncate text-center text-base font-semibold text-neutral-100 sm:text-lg">
           {MESES_PT[month]} de {year}
         </h1>
         <Link
           href={`/dashboard/calendario?ano=${next.year}&mes=${next.month}`}
-          className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
+          className="shrink-0 rounded-md border border-white/10 px-2.5 py-1.5 text-sm text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100 sm:px-3"
         >
-          Próximo →
+          <span className="hidden sm:inline">Próximo </span>
+          <span aria-hidden>→</span>
         </Link>
       </div>
 
@@ -83,7 +85,7 @@ export default async function CalendarioPage({
             <Link
               key={iso}
               href={`/dashboard?data=${iso}`}
-              className={`flex min-h-20 flex-col rounded-md border p-2 text-left transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] ${
+              className={`flex min-h-14 flex-col rounded-md border p-1.5 text-left transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] sm:min-h-20 sm:p-2 ${
                 isToday ? "border-emerald-500/60 bg-emerald-500/5" : "border-neutral-800"
               } ${inMonth ? "bg-neutral-900/60" : "bg-transparent opacity-40"}`}
             >
