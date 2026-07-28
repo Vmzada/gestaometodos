@@ -48,6 +48,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
   const [deleting, setDeleting] = useState(false);
   const [deposito, setDeposito] = useState(entry.deposito);
   const [saque, setSaque] = useState(entry.saque);
+  const [clienteParte, setClienteParte] = useState(entry.cliente_parte);
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
       try {
@@ -72,7 +73,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
   }
 
   if (editing) {
-    const lucroPreview = saque - deposito;
+    const lucroPreview = saque - deposito - clienteParte;
     return (
       <tr className="border-b border-neutral-900">
         <td colSpan={8} className="py-3">
@@ -86,6 +87,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
               step="0.01"
               defaultValue={entry.cliente_parte}
               required
+              onChange={(e) => setClienteParte(Number(e.target.value) || 0)}
             />
             <Input
               name="deposito"

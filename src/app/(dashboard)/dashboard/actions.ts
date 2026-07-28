@@ -31,7 +31,7 @@ function parseEntryFields(formData: FormData) {
     return null;
   }
 
-  const lucro = saque - deposito;
+  const lucro = saque - deposito - cliente_parte;
 
   return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, lucro };
 }

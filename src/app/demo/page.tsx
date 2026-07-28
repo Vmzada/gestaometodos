@@ -22,7 +22,7 @@ const FAKE_ENTRIES: Entry[] = [
     cliente_parte: 45,
     deposito: 500,
     saque: 620.5,
-    lucro: 120.5,
+    lucro: 75.5,
     created_at: NOW_ISO,
   },
   {
@@ -34,7 +34,7 @@ const FAKE_ENTRIES: Entry[] = [
     cliente_parte: 30,
     deposito: 300,
     saque: 380,
-    lucro: 80,
+    lucro: 50,
     created_at: NOW_ISO,
   },
   {
@@ -46,7 +46,7 @@ const FAKE_ENTRIES: Entry[] = [
     cliente_parte: 25,
     deposito: 200,
     saque: 265.75,
-    lucro: 65.75,
+    lucro: 40.75,
     created_at: NOW_ISO,
   },
 ];

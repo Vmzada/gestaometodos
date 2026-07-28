@@ -12,6 +12,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
   const [pending, startTransition] = useTransition();
   const [deposito, setDeposito] = useState(0);
   const [saque, setSaque] = useState(0);
+  const [clienteParte, setClienteParte] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleSubmit(formData: FormData) {
@@ -26,10 +27,11 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
       formRef.current?.reset();
       setDeposito(0);
       setSaque(0);
+      setClienteParte(0);
     });
   }
 
-  const lucro = saque - deposito;
+  const lucro = saque - deposito - clienteParte;
 
   return (
     <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-6">
@@ -74,6 +76,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
           defaultValue="0"
           disabled={readOnly}
           required
+          onChange={(e) => setClienteParte(Number(e.target.value) || 0)}
         />
       </div>
       <div>
