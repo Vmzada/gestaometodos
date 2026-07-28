@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { createClient } from "@/lib/supabase/server";
 import { daysUntil } from "@/lib/date-helpers";
+import { hasActiveSubscription, isTrialActive, getTrialEndsAt } from "@/lib/subscription";
+import { TrialCountdownBanner } from "@/components/trial-countdown-banner";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -10,14 +12,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } = await supabase.auth.getUser();
 
   let expiryBanner: string | null = null;
+  let trialEndsAt: string | null = null;
+
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_expires_at")
+      .select("subscription_status, subscription_expires_at, trial_started_at")
       .eq("id", user.id)
       .single();
 
-    if (profile?.subscription_expires_at) {
+    if (profile && !hasActiveSubscription(profile) && isTrialActive(profile)) {
+      trialEndsAt = getTrialEndsAt(profile)!.toISOString();
+    } else if (profile?.subscription_expires_at) {
       const daysLeft = daysUntil(profile.subscription_expires_at);
       if (daysLeft <= 5) {
         expiryBanner =
@@ -33,7 +39,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="bg-grid pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
       <div className="relative">
         <Navbar />
-        {expiryBanner && (
+        {trialEndsAt && <TrialCountdownBanner endsAt={trialEndsAt} />}
+        {!trialEndsAt && expiryBanner && (
           <div className="border-b border-amber-500/20 bg-amber-500/10 px-6 py-2 text-center text-sm text-amber-300">
             {expiryBanner}{" "}
             <Link href="/assinatura" className="font-medium underline">

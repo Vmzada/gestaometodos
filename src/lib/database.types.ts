@@ -8,6 +8,7 @@ export type Database = {
           subscription_status: "inactive" | "active" | "cancelled";
           mp_subscription_id: string | null;
           subscription_expires_at: string | null;
+          trial_started_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -16,11 +17,13 @@ export type Database = {
           subscription_status?: "inactive" | "active" | "cancelled";
           mp_subscription_id?: string | null;
           subscription_expires_at?: string | null;
+          trial_started_at?: string | null;
         };
         Update: {
           subscription_status?: "inactive" | "active" | "cancelled";
           mp_subscription_id?: string | null;
           subscription_expires_at?: string | null;
+          trial_started_at?: string | null;
         };
         Relationships: [];
       };
