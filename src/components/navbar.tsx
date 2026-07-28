@@ -11,7 +11,26 @@ const LINKS = [
   { href: "/dashboard/calendario", label: "Calendário" },
 ];
 
-export function Navbar() {
+function SubscriptionBadge({ daysLeft }: { daysLeft: number }) {
+  const urgent = daysLeft <= 5;
+  return (
+    <span
+      className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium ${
+        urgent
+          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+          : "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+      }`}
+    >
+      {daysLeft > 0 ? `${daysLeft} dia${daysLeft === 1 ? "" : "s"} restantes` : "Expirada"}
+    </span>
+  );
+}
+
+export function Navbar({
+  subscriptionDaysLeft = null,
+}: {
+  subscriptionDaysLeft?: number | null;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,6 +48,7 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {subscriptionDaysLeft !== null && <SubscriptionBadge daysLeft={subscriptionDaysLeft} />}
           <form action={signOut}>
             <Button type="submit" variant="ghost">
               Sair
@@ -55,6 +75,11 @@ export function Navbar() {
 
       {open && (
         <div className="flex flex-col gap-1 border-t border-white/5 px-4 pb-4 pt-2 sm:hidden">
+          {subscriptionDaysLeft !== null && (
+            <div className="px-2 py-2">
+              <SubscriptionBadge daysLeft={subscriptionDaysLeft} />
+            </div>
+          )}
           {LINKS.map((link) => (
             <Link
               key={link.href}
