@@ -23,6 +23,15 @@ const FEATURES = [
   },
 ];
 
+const PLAN_INCLUDES = [
+  "Lucro com Método calculado automaticamente",
+  "Lucro com Delay calculado automaticamente",
+  "Dashboard completo com totais em tempo real",
+  "Calendário com o histórico de todos os dias",
+  "Pagamento por Pix ou cartão",
+  "Suporte via WhatsApp",
+];
+
 const MOCK_ROWS = [
   { casa: "Bet365", cliente: "Carlos Souza", lucro: "R$ 120,50" },
   { casa: "Betano", cliente: "Marina Lima", lucro: "R$ 80,00" },
@@ -124,6 +133,30 @@ export default function Home() {
               <p className="my-3 text-4xl font-bold text-neutral-100">
                 R$ 14,99<span className="text-base font-normal text-neutral-400">/mês</span>
               </p>
+
+              <ul className="mb-6 space-y-2.5 text-left">
+                {PLAN_INCLUDES.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-neutral-300">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.15" />
+                      <path
+                        d="M7.5 12.5l3 3 6-6.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
               <Link href="/cadastro">
                 <Button className="w-full">Assinar agora</Button>
               </Link>

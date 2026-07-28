@@ -42,3 +42,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local Claude Code session settings (can contain command logs with secrets)
+.claude/
