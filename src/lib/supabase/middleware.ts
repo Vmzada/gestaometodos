@@ -42,6 +42,12 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.includes(pathname);
 
+  // API routes (e.g. the Mercado Pago webhook) handle their own auth and must
+  // never be redirected to /login: external callers send no session cookie.
+  if (pathname.startsWith("/api/")) {
+    return response;
+  }
+
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
