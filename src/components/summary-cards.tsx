@@ -1,7 +1,41 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { formatBRL } from "@/lib/date-helpers";
+
+function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={hidden ? "Mostrar valor" : "Ocultar valor"}
+      className="text-neutral-500 transition-colors hover:text-neutral-300"
+    >
+      {hidden ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-4 w-4">
+          <path d="M3 3l18 18" strokeLinecap="round" />
+          <path
+            d="M10.6 10.6a3 3 0 0 0 4.24 4.24M9.75 5.2A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-3.09 3.9M6.2 6.2C4.04 7.54 2 12 2 12a13.4 13.4 0 0 0 4.1 4.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-4 w-4">
+          <path
+            d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 export function SummaryCards({
   hoje,
@@ -20,20 +54,28 @@ export function SummaryCards({
   mesNextHref?: string;
   mesIsCurrent?: boolean;
 }) {
+  const [hidden, setHidden] = useState<Record<string, boolean>>({});
+  const toggle = (key: string) => setHidden((h) => ({ ...h, [key]: !h[key] }));
+
   const items = [
-    { label: "Hoje", value: hoje, icon: "☀️" },
-    { label: "Esta semana", value: semana, icon: "📅" },
+    { key: "hoje", label: "Hoje", value: hoje, icon: "☀️" },
+    { key: "semana", label: "Esta semana", value: semana, icon: "📅" },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {items.map((item) => (
-        <TiltCard key={item.label} maxTilt={6}>
+        <TiltCard key={item.key} maxTilt={6}>
           <Card className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-neutral-400">{item.label}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm text-neutral-400">{item.label}</p>
+                <EyeToggle hidden={!!hidden[item.key]} onClick={() => toggle(item.key)} />
+              </div>
               <p
-                className={`mt-1 text-2xl font-semibold ${item.value >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                className={`mt-1 text-2xl font-semibold ${item.value >= 0 ? "text-emerald-400" : "text-red-400"} ${
+                  hidden[item.key] ? "select-none blur-sm" : ""
+                }`}
               >
                 {formatBRL(item.value)}
               </p>
@@ -46,9 +88,14 @@ export function SummaryCards({
       <TiltCard maxTilt={6}>
         <Card className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
+              <EyeToggle hidden={!!hidden.mes} onClick={() => toggle("mes")} />
+            </div>
             <p
-              className={`mt-1 text-2xl font-semibold ${mes >= 0 ? "text-emerald-400" : "text-red-400"}`}
+              className={`mt-1 text-2xl font-semibold ${mes >= 0 ? "text-emerald-400" : "text-red-400"} ${
+                hidden.mes ? "select-none blur-sm" : ""
+              }`}
             >
               {formatBRL(mes)}
             </p>
