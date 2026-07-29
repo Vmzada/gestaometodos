@@ -6,6 +6,7 @@ import {
   MESES_PT,
   formatBRL,
   getCalendarGrid,
+  nowInBrazil,
   todayISO,
   toISODate,
 } from "@/lib/date-helpers";
@@ -18,9 +19,9 @@ export default async function CalendarioPage({
   searchParams: Promise<{ ano?: string; mes?: string }>;
 }) {
   const params = await searchParams;
-  const now = new Date();
-  const year = Number(params.ano) || now.getFullYear();
-  const month = params.mes ? Number(params.mes) - 1 : now.getMonth();
+  const now = nowInBrazil();
+  const year = Number(params.ano) || now.getUTCFullYear();
+  const month = params.mes ? Number(params.mes) - 1 : now.getUTCMonth();
   const today = todayISO();
 
   const supabase = await createClient();
@@ -90,7 +91,7 @@ export default async function CalendarioPage({
               } ${inMonth ? "bg-neutral-900/60" : "bg-transparent opacity-40"}`}
             >
               <span className={`text-xs ${isToday ? "font-semibold text-emerald-400" : "text-neutral-400"}`}>
-                {date.getDate()}
+                {date.getUTCDate()}
               </span>
               {total !== undefined && (
                 <span

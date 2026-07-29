@@ -6,7 +6,7 @@ import { DelayEntriesTable } from "@/components/delay-entries-table";
 import { DashboardTabs } from "@/components/dashboard-tabs";
 import { SummaryCards } from "@/components/summary-cards";
 import { Card } from "@/components/ui/card";
-import { getMonthRange, getWeekRange, todayISO } from "@/lib/date-helpers";
+import { getMonthRange, getWeekRange, nowInBrazil, todayISO } from "@/lib/date-helpers";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -28,8 +28,8 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
 
   const today = todayISO();
-  const week = getWeekRange(new Date());
-  const month = getMonthRange(new Date());
+  const week = getWeekRange(nowInBrazil());
+  const month = getMonthRange(nowInBrazil());
 
   const listQuery = selectedDate
     ? supabase.from("entries").select("*").eq("user_id", user!.id).eq("entry_date", selectedDate)
