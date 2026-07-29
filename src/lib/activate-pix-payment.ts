@@ -15,9 +15,18 @@ export async function activatePixPayment(paymentId: string) {
   const supabase = createAdminClient();
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_expires_at")
+    .select("subscription_expires_at, mp_subscription_id")
     .eq("id", userId)
     .single();
+
+  // Mercado Pago can redeliver the same webhook notification (retries after
+  // a prior failed attempt, e.g. while the endpoint was misconfigured) or the
+  // client-side status poll can race the webhook for the same payment. Since
+  // this payment id was already applied, adding another period would give
+  // free days the customer never paid for.
+  if (profile?.mp_subscription_id === paymentId) {
+    return { activated: true, userId };
+  }
 
   const currentExpiry = profile?.subscription_expires_at
     ? new Date(profile.subscription_expires_at)
