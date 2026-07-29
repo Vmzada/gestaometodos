@@ -10,7 +10,14 @@ import { ReconcileButton } from "./reconcile-button";
 export const dynamic = "force-dynamic";
 
 function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleDateString("pt-BR");
+  return new Date(iso).toLocaleString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 type Status = "Pago" | "Em teste" | "Sem acesso";
@@ -34,7 +41,7 @@ export default async function AdminPage() {
   const { data: profiles } = await admin
     .from("profiles")
     .select(
-      "id, email, subscription_status, subscription_expires_at, trial_started_at, mp_subscription_id, created_at",
+      "id, email, subscription_status, subscription_expires_at, trial_started_at, mp_subscription_id, last_payment_at, created_at",
     )
     .order("created_at", { ascending: false });
 
@@ -79,6 +86,7 @@ export default async function AdminPage() {
                 <th className="px-3 py-2 font-medium">Dias restantes</th>
                 <th className="px-3 py-2 font-medium">Vence em</th>
                 <th className="px-3 py-2 font-medium">Cadastro</th>
+                <th className="px-3 py-2 font-medium">Data do pagamento</th>
                 <th className="px-3 py-2 font-medium">Pagamento MP</th>
               </tr>
             </thead>
@@ -103,6 +111,9 @@ export default async function AdminPage() {
                     {r.subscription_expires_at ? formatDateTime(r.subscription_expires_at) : "—"}
                   </td>
                   <td className="px-3 py-2 text-neutral-400">{formatDateTime(r.created_at)}</td>
+                  <td className="px-3 py-2 text-neutral-400">
+                    {r.last_payment_at ? formatDateTime(r.last_payment_at) : "—"}
+                  </td>
                   <td className="px-3 py-2 text-neutral-500">{r.mp_subscription_id ?? "—"}</td>
                 </tr>
               ))}

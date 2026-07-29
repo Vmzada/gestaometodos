@@ -40,6 +40,7 @@ export async function activatePixPayment(paymentId: string) {
       subscription_status: "active",
       subscription_expires_at: newExpiry.toISOString(),
       mp_subscription_id: paymentId,
+      last_payment_at: payment.date_approved ?? new Date().toISOString(),
     })
     .eq("id", userId);
 
