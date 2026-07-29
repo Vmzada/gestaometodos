@@ -40,6 +40,7 @@ export type Database = {
           cliente_parte: number;
           deposito: number;
           saque: number;
+          cpa: number;
           lucro: number;
           created_at: string;
         };
@@ -52,6 +53,7 @@ export type Database = {
           cliente_parte: number;
           deposito: number;
           saque: number;
+          cpa?: number;
           lucro: number;
         };
         Update: {
@@ -61,6 +63,7 @@ export type Database = {
           cliente_parte?: number;
           deposito?: number;
           saque?: number;
+          cpa?: number;
           lucro?: number;
         };
         Relationships: [];

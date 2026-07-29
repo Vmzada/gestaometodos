@@ -20,7 +20,7 @@ export function EntriesTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[820px] text-sm">
+      <table className="w-full min-w-[920px] text-sm">
         <thead>
           <tr className="border-b border-neutral-800 text-left text-neutral-400">
             <th className="py-2 pr-3 font-medium">Data</th>
@@ -29,6 +29,7 @@ export function EntriesTable({
             <th className="py-2 pr-3 font-medium">Parte do cliente</th>
             <th className="py-2 pr-3 font-medium">Depósito</th>
             <th className="py-2 pr-3 font-medium">Saque</th>
+            <th className="py-2 pr-3 font-medium">CPA</th>
             <th className="py-2 pr-3 font-medium">Lucro</th>
             <th className="py-2 pr-3 font-medium"></th>
           </tr>
@@ -49,6 +50,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
   const [deposito, setDeposito] = useState(entry.deposito);
   const [saque, setSaque] = useState(entry.saque);
   const [clienteParte, setClienteParte] = useState(entry.cliente_parte);
+  const [cpa, setCpa] = useState(entry.cpa);
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
       try {
@@ -73,11 +75,11 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
   }
 
   if (editing) {
-    const lucroPreview = saque - deposito - clienteParte;
+    const lucroPreview = saque - deposito - clienteParte + cpa;
     return (
       <tr className="border-b border-neutral-900">
-        <td colSpan={8} className="py-3">
-          <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-6">
+        <td colSpan={9} className="py-3">
+          <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
             <Input name="entry_date" type="date" defaultValue={entry.entry_date} required />
             <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
             <Input name="cliente_nome" defaultValue={entry.cliente_nome} required />
@@ -105,7 +107,14 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
               required
               onChange={(e) => setSaque(Number(e.target.value) || 0)}
             />
-            <div className="col-span-2 flex items-center gap-4 sm:col-span-6">
+            <Input
+              name="cpa"
+              type="number"
+              step="0.01"
+              defaultValue={entry.cpa}
+              onChange={(e) => setCpa(Number(e.target.value) || 0)}
+            />
+            <div className="col-span-2 flex items-center gap-4 sm:col-span-7">
               <p className="text-sm text-neutral-400">
                 Lucro calculado:{" "}
                 <span
@@ -117,7 +126,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
                 </span>
               </p>
             </div>
-            <div className="col-span-2 flex gap-2 sm:col-span-6">
+            <div className="col-span-2 flex gap-2 sm:col-span-7">
               <Button type="submit" disabled={pending}>
                 {pending ? "Salvando..." : "Salvar"}
               </Button>
@@ -126,7 +135,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
               </Button>
             </div>
             {state.error && (
-              <p className="col-span-2 text-sm text-red-400 sm:col-span-6">{state.error}</p>
+              <p className="col-span-2 text-sm text-red-400 sm:col-span-7">{state.error}</p>
             )}
           </form>
         </td>
@@ -142,6 +151,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
       <td className="py-2 pr-3">{formatBRL(entry.cliente_parte)}</td>
       <td className="py-2 pr-3">{formatBRL(entry.deposito)}</td>
       <td className="py-2 pr-3">{formatBRL(entry.saque)}</td>
+      <td className="py-2 pr-3 text-neutral-400">{entry.cpa ? formatBRL(entry.cpa) : "—"}</td>
       <td
         className={`py-2 pr-3 font-medium ${entry.lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}
       >

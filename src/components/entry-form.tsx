@@ -13,6 +13,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
   const [deposito, setDeposito] = useState(0);
   const [saque, setSaque] = useState(0);
   const [clienteParte, setClienteParte] = useState(0);
+  const [cpa, setCpa] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
 
   function handleSubmit(formData: FormData) {
@@ -28,13 +29,14 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
       setDeposito(0);
       setSaque(0);
       setClienteParte(0);
+      setCpa(0);
     });
   }
 
-  const lucro = saque - deposito - clienteParte;
+  const lucro = saque - deposito - clienteParte + cpa;
 
   return (
-    <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-6">
+    <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-7">
       <div>
         <Label htmlFor="entry_date">Data</Label>
         <Input
@@ -105,7 +107,19 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
           onChange={(e) => setSaque(Number(e.target.value) || 0)}
         />
       </div>
-      <div className="col-span-2 flex items-end justify-between gap-4 sm:col-span-6">
+      <div>
+        <Label htmlFor="cpa">CPA (R$) — opcional</Label>
+        <Input
+          id="cpa"
+          name="cpa"
+          type="number"
+          step="0.01"
+          defaultValue="0"
+          disabled={readOnly}
+          onChange={(e) => setCpa(Number(e.target.value) || 0)}
+        />
+      </div>
+      <div className="col-span-2 flex items-end justify-between gap-4 sm:col-span-7">
         <p className="text-sm text-neutral-400">
           Lucro calculado:{" "}
           <span className={lucro >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-400"}>
@@ -113,7 +127,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
           </span>
         </p>
       </div>
-      <div className="col-span-2 sm:col-span-6">
+      <div className="col-span-2 sm:col-span-7">
         {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={readOnly || pending}>
           {readOnly ? "Assine para adicionar" : pending ? "Adicionando..." : "Adicionar lançamento"}

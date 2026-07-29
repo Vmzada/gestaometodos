@@ -19,6 +19,8 @@ function parseEntryFields(formData: FormData) {
   const cliente_parte = Number(formData.get("cliente_parte"));
   const deposito = Number(formData.get("deposito"));
   const saque = Number(formData.get("saque"));
+  const cpaRaw = formData.get("cpa");
+  const cpa = cpaRaw ? Number(cpaRaw) : 0;
 
   if (
     !entry_date ||
@@ -26,14 +28,15 @@ function parseEntryFields(formData: FormData) {
     !cliente_nome ||
     Number.isNaN(cliente_parte) ||
     Number.isNaN(deposito) ||
-    Number.isNaN(saque)
+    Number.isNaN(saque) ||
+    Number.isNaN(cpa)
   ) {
     return null;
   }
 
-  const lucro = saque - deposito - cliente_parte;
+  const lucro = saque - deposito - cliente_parte + cpa;
 
-  return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, lucro };
+  return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, cpa, lucro };
 }
 
 function parseDelayEntryFields(formData: FormData) {
