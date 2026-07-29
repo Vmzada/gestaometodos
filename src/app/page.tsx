@@ -43,14 +43,16 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-neutral-950">
       <RecoveryRedirectHandler />
       <header className="sticky top-0 z-20 border-b border-white/5 bg-neutral-950/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Logo />
-          <div className="flex gap-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:px-6">
+          <Logo textClassName="hidden sm:inline" />
+          <div className="flex shrink-0 gap-2 sm:gap-3">
             <Link href="/login">
-              <Button variant="ghost">Entrar</Button>
+              <Button variant="ghost" className="px-3 sm:px-4">
+                Entrar
+              </Button>
             </Link>
             <Link href="/cadastro">
-              <Button>Criar conta</Button>
+              <Button className="px-3 sm:px-4">Criar conta</Button>
             </Link>
           </div>
         </div>

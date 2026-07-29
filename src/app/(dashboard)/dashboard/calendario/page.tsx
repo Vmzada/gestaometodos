@@ -70,7 +70,7 @@ export default async function CalendarioPage({
         </Link>
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5 text-center text-xs text-neutral-500">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5 text-center text-xs text-neutral-500">
         {DIAS_SEMANA_PT.map((dia) => (
           <div key={dia} className="pb-2">
             {dia}
@@ -78,7 +78,7 @@ export default async function CalendarioPage({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
         {grid.map(({ iso, date, inMonth }) => {
           const total = totalsByDay.get(iso);
           const isToday = iso === today;
@@ -86,16 +86,18 @@ export default async function CalendarioPage({
             <Link
               key={iso}
               href={`/dashboard?data=${iso}`}
-              className={`flex min-h-14 flex-col rounded-md border p-1.5 text-left transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] sm:min-h-20 sm:p-2 ${
+              className={`flex min-h-14 flex-col overflow-hidden rounded-md border p-1 text-left transition-all duration-150 hover:z-10 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:shadow-[0_8px_24px_-8px_rgba(16,185,129,0.5)] sm:min-h-20 sm:p-2 ${
                 isToday ? "border-emerald-500/60 bg-emerald-500/5" : "border-neutral-800"
               } ${inMonth ? "bg-neutral-900/60" : "bg-transparent opacity-40"}`}
             >
-              <span className={`text-xs ${isToday ? "font-semibold text-emerald-400" : "text-neutral-400"}`}>
+              <span
+                className={`text-[10px] sm:text-xs ${isToday ? "font-semibold text-emerald-400" : "text-neutral-400"}`}
+              >
                 {date.getUTCDate()}
               </span>
               {total !== undefined && (
                 <span
-                  className={`mt-auto text-xs font-medium ${
+                  className={`mt-auto truncate text-[9px] font-medium sm:text-xs ${
                     total >= 0 ? "text-emerald-400" : "text-red-400"
                   }`}
                 >
