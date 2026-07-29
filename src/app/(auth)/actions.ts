@@ -8,9 +8,14 @@ type FormState = { error: string | null };
 export async function signUp(_prevState: FormState, formData: FormData): Promise<FormState> {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
+  const fullName = String(formData.get("full_name") ?? "").trim();
+  const phoneDigits = String(formData.get("phone") ?? "").replace(/\D/g, "");
 
   if (!email || password.length < 6) {
     return { error: "Informe um email válido e uma senha com pelo menos 6 caracteres." };
+  }
+  if (!fullName) {
+    return { error: "Informe seu nome completo." };
   }
 
   const supabase = await createClient();
@@ -19,6 +24,10 @@ export async function signUp(_prevState: FormState, formData: FormData): Promise
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      data: {
+        full_name: fullName,
+        phone: phoneDigits || null,
+      },
     },
   });
 

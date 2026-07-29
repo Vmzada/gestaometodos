@@ -9,6 +9,16 @@ import { ReconcileButton } from "./reconcile-button";
 
 export const dynamic = "force-dynamic";
 
+function formatPhone(digits: string) {
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  return digits;
+}
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("pt-BR", {
     timeZone: "America/Sao_Paulo",
@@ -41,7 +51,7 @@ export default async function AdminPage() {
   const { data: profiles } = await admin
     .from("profiles")
     .select(
-      "id, email, subscription_status, subscription_expires_at, trial_started_at, mp_subscription_id, last_payment_at, created_at",
+      "id, email, full_name, phone, subscription_status, subscription_expires_at, trial_started_at, mp_subscription_id, last_payment_at, created_at",
     )
     .order("created_at", { ascending: false });
 
@@ -78,10 +88,12 @@ export default async function AdminPage() {
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-neutral-800">
-          <table className="w-full min-w-[760px] text-sm">
+          <table className="w-full min-w-[980px] text-sm">
             <thead>
               <tr className="border-b border-neutral-800 bg-neutral-900/50 text-left text-neutral-400">
                 <th className="px-3 py-2 font-medium">Email</th>
+                <th className="px-3 py-2 font-medium">Nome</th>
+                <th className="px-3 py-2 font-medium">WhatsApp</th>
                 <th className="px-3 py-2 font-medium">Status</th>
                 <th className="px-3 py-2 font-medium">Dias restantes</th>
                 <th className="px-3 py-2 font-medium">Vence em</th>
@@ -97,6 +109,10 @@ export default async function AdminPage() {
                   className="border-b border-neutral-900 text-neutral-200 transition-colors hover:bg-white/[0.03]"
                 >
                   <td className="px-3 py-2">{r.email}</td>
+                  <td className="px-3 py-2 text-neutral-400">{r.full_name ?? "—"}</td>
+                  <td className="px-3 py-2 text-neutral-400">
+                    {r.phone ? formatPhone(r.phone) : "—"}
+                  </td>
                   <td className="px-3 py-2">
                     <span
                       className={`rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_CLASSES[r.status]}`}

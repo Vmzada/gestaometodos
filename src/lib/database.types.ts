@@ -11,6 +11,8 @@ export type Database = {
           trial_started_at: string | null;
           renewal_reminder_sent_for: string | null;
           last_payment_at: string | null;
+          full_name: string | null;
+          phone: string | null;
           created_at: string;
         };
         Insert: {
@@ -22,6 +24,8 @@ export type Database = {
           trial_started_at?: string | null;
           renewal_reminder_sent_for?: string | null;
           last_payment_at?: string | null;
+          full_name?: string | null;
+          phone?: string | null;
         };
         Update: {
           subscription_status?: "inactive" | "active" | "cancelled";
@@ -30,6 +34,8 @@ export type Database = {
           trial_started_at?: string | null;
           renewal_reminder_sent_for?: string | null;
           last_payment_at?: string | null;
+          full_name?: string | null;
+          phone?: string | null;
         };
         Relationships: [];
       };

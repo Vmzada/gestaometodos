@@ -17,8 +17,22 @@ export default function CadastroPage() {
       <h1 className="mb-6 text-center text-2xl font-semibold text-neutral-100">Criar conta</h1>
       <form action={formAction} className="space-y-4">
         <div>
+          <Label htmlFor="full_name">Nome completo</Label>
+          <Input id="full_name" name="full_name" autoComplete="name" required />
+        </div>
+        <div>
           <Label htmlFor="email">Email</Label>
           <Input id="email" name="email" type="email" autoComplete="email" required />
+        </div>
+        <div>
+          <Label htmlFor="phone">WhatsApp (opcional)</Label>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            placeholder="(51) 98408-4536"
+          />
         </div>
         <div>
           <Label htmlFor="password">Senha</Label>
