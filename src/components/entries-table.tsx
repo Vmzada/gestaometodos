@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { updateEntry, deleteEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Pagination, PAGE_SIZE } from "@/components/ui/pagination";
 import { formatBRL } from "@/lib/date-helpers";
 import type { Entry } from "@/lib/database.types";
 
@@ -14,32 +16,43 @@ export function EntriesTable({
   entries: Entry[];
   readOnly?: boolean;
 }) {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedEntries = useMemo(
+    () => entries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [entries, currentPage],
+  );
+
   if (entries.length === 0) {
     return <p className="text-sm text-neutral-500">Nenhum lançamento neste período.</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[920px] text-sm">
-        <thead>
-          <tr className="border-b border-neutral-800 text-left text-neutral-400">
-            <th className="py-2 pr-3 font-medium">Data</th>
-            <th className="py-2 pr-3 font-medium">Casa de aposta</th>
-            <th className="py-2 pr-3 font-medium">Cliente</th>
-            <th className="py-2 pr-3 font-medium">Parte do cliente</th>
-            <th className="py-2 pr-3 font-medium">Depósito</th>
-            <th className="py-2 pr-3 font-medium">Saque</th>
-            <th className="py-2 pr-3 font-medium">CPA</th>
-            <th className="py-2 pr-3 font-medium">Lucro</th>
-            <th className="py-2 pr-3 font-medium"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => (
-            <EntryRow key={entry.id} entry={entry} readOnly={readOnly} />
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[920px] text-sm">
+          <thead>
+            <tr className="border-b border-neutral-800 text-left text-neutral-400">
+              <th className="py-2 pr-3 font-medium">Data</th>
+              <th className="py-2 pr-3 font-medium">Casa de aposta</th>
+              <th className="py-2 pr-3 font-medium">Cliente</th>
+              <th className="py-2 pr-3 font-medium">Parte do cliente</th>
+              <th className="py-2 pr-3 font-medium">Depósito</th>
+              <th className="py-2 pr-3 font-medium">Saque</th>
+              <th className="py-2 pr-3 font-medium">CPA</th>
+              <th className="py-2 pr-3 font-medium">Lucro</th>
+              <th className="py-2 pr-3 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedEntries.map((entry) => (
+              <EntryRow key={entry.id} entry={entry} readOnly={readOnly} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }
@@ -80,7 +93,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
       <tr className="border-b border-neutral-900">
         <td colSpan={9} className="py-3">
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
-            <Input name="entry_date" type="date" defaultValue={entry.entry_date} required />
+            <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
             <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
             <Input name="cliente_nome" defaultValue={entry.cliente_nome} required />
             <Input

@@ -5,6 +5,7 @@ import { DelayEntryForm } from "@/components/delay-entry-form";
 import { DelayEntriesTable } from "@/components/delay-entries-table";
 import { DashboardTabs } from "@/components/dashboard-tabs";
 import { SummaryCards } from "@/components/summary-cards";
+import { BancaCard } from "@/components/banca-card";
 import { Card } from "@/components/ui/card";
 import { getMonthRange, getWeekRange, MESES_PT, nowInBrazil, todayISO } from "@/lib/date-helpers";
 import Link from "next/link";
@@ -77,6 +78,7 @@ export default async function DashboardPage({
     delayMesRes,
     listRes,
     delayListRes,
+    profileRes,
   ] = await Promise.all([
     supabase.from("entries").select("lucro").eq("user_id", user!.id).eq("entry_date", today),
     supabase
@@ -110,11 +112,15 @@ export default async function DashboardPage({
       .lte("entry_date", month.end),
     isDelay ? Promise.resolve({ data: [] }) : listQuery,
     isDelay ? delayListQuery : Promise.resolve({ data: [] }),
+    supabase.from("profiles").select("meta_semanal, meta_mensal, banca_inicial").eq("id", user!.id).single(),
   ]);
 
   const hoje = sum(hojeRes.data) + sum(delayHojeRes.data);
   const semana = sum(semanaRes.data) + sum(delaySemanaRes.data);
   const mes = sum(mesRes.data) + sum(delayMesRes.data);
+  const metaSemanal = profileRes.data?.meta_semanal ?? null;
+  const metaMensal = profileRes.data?.meta_mensal ?? null;
+  const bancaInicial = profileRes.data?.banca_inicial ?? null;
 
   return (
     <div className="space-y-8">
@@ -126,7 +132,11 @@ export default async function DashboardPage({
         mesPrevHref={mesPrevHref}
         mesNextHref={mesNextHref}
         mesIsCurrent={isCurrentMonth}
+        metaSemanal={metaSemanal}
+        metaMensal={metaMensal}
       />
+
+      {isCurrentMonth && <BancaCard bancaInicial={bancaInicial} lucroMes={mes} mesLabel={mesLabel} />}
 
       <DashboardTabs active={isDelay ? "delay" : "metodo"} />
 
@@ -148,7 +158,7 @@ export default async function DashboardPage({
                 </Link>
               )}
             </div>
-            <DelayEntriesTable entries={delayListRes.data ?? []} />
+            <DelayEntriesTable key={mesParam ?? "current"} entries={delayListRes.data ?? []} />
           </Card>
         </>
       ) : (
@@ -171,7 +181,10 @@ export default async function DashboardPage({
                 </Link>
               )}
             </div>
-            <EntriesTable entries={listRes.data ?? []} />
+            <EntriesTable
+              key={selectedDate ?? mesParam ?? "current"}
+              entries={listRes.data ?? []}
+            />
           </Card>
         </>
       )}

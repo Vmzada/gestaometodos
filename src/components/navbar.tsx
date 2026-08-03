@@ -9,6 +9,7 @@ import { Logo } from "@/components/ui/logo";
 const LINKS = [
   { href: "/dashboard", label: "Lançamentos" },
   { href: "/dashboard/calendario", label: "Calendário" },
+  { href: "/dashboard/estatisticas", label: "Estatísticas" },
 ];
 
 function SubscriptionBadge({ daysLeft }: { daysLeft: number }) {

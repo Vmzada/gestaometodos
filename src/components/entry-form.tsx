@@ -5,6 +5,7 @@ import { createEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker, type DatePickerHandle } from "@/components/ui/date-picker";
 import { formatBRL, todayISO } from "@/lib/date-helpers";
 
 export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
@@ -15,6 +16,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
   const [clienteParte, setClienteParte] = useState(0);
   const [cpa, setCpa] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
+  const dateRef = useRef<DatePickerHandle>(null);
 
   function handleSubmit(formData: FormData) {
     if (readOnly) return;
@@ -26,6 +28,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
       }
       setError(null);
       formRef.current?.reset();
+      dateRef.current?.reset();
       setDeposito(0);
       setSaque(0);
       setClienteParte(0);
@@ -39,10 +42,10 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
     <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-7">
       <div>
         <Label htmlFor="entry_date">Data</Label>
-        <Input
+        <DatePicker
+          ref={dateRef}
           id="entry_date"
           name="entry_date"
-          type="date"
           defaultValue={todayISO()}
           disabled={readOnly}
           required

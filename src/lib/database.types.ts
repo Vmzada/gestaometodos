@@ -13,6 +13,9 @@ export type Database = {
           last_payment_at: string | null;
           full_name: string | null;
           phone: string | null;
+          meta_semanal: number | null;
+          meta_mensal: number | null;
+          banca_inicial: number | null;
           created_at: string;
         };
         Insert: {
@@ -26,6 +29,9 @@ export type Database = {
           last_payment_at?: string | null;
           full_name?: string | null;
           phone?: string | null;
+          meta_semanal?: number | null;
+          meta_mensal?: number | null;
+          banca_inicial?: number | null;
         };
         Update: {
           subscription_status?: "inactive" | "active" | "cancelled";
@@ -35,6 +41,9 @@ export type Database = {
           renewal_reminder_sent_for?: string | null;
           last_payment_at?: string | null;
           full_name?: string | null;
+          meta_semanal?: number | null;
+          meta_mensal?: number | null;
+          banca_inicial?: number | null;
           phone?: string | null;
         };
         Relationships: [];

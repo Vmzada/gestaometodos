@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { TiltCard } from "@/components/ui/tilt-card";
+import { GoalProgress } from "@/components/goal-progress";
 import { formatBRL } from "@/lib/date-helpers";
 
 function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }) {
@@ -45,6 +46,8 @@ export function SummaryCards({
   mesPrevHref,
   mesNextHref,
   mesIsCurrent = true,
+  metaSemanal = null,
+  metaMensal = null,
 }: {
   hoje: number;
   semana: number;
@@ -53,79 +56,115 @@ export function SummaryCards({
   mesPrevHref?: string;
   mesNextHref?: string;
   mesIsCurrent?: boolean;
+  metaSemanal?: number | null;
+  metaMensal?: number | null;
 }) {
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setHidden((h) => ({ ...h, [key]: !h[key] }));
 
-  const items = [
-    { key: "hoje", label: "Hoje", value: hoje, icon: "☀️" },
-    { key: "semana", label: "Esta semana", value: semana, icon: "📅" },
-  ];
-
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      {items.map((item) => (
-        <TiltCard key={item.key} maxTilt={6}>
-          <Card className="flex items-center justify-between">
+      <TiltCard maxTilt={6} className="h-full">
+        <Card className="h-full">
+          <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5">
-                <p className="text-sm text-neutral-400">{item.label}</p>
-                <EyeToggle hidden={!!hidden[item.key]} onClick={() => toggle(item.key)} />
+                <p className="text-sm text-neutral-400">Hoje</p>
+                <EyeToggle hidden={!!hidden.hoje} onClick={() => toggle("hoje")} />
               </div>
               <p
-                className={`mt-1 text-2xl font-semibold ${item.value >= 0 ? "text-emerald-400" : "text-red-400"} ${
-                  hidden[item.key] ? "select-none blur-sm" : ""
+                className={`mt-1 text-2xl font-semibold ${hoje >= 0 ? "text-emerald-400" : "text-red-400"} ${
+                  hidden.hoje ? "select-none blur-sm" : ""
                 }`}
               >
-                {formatBRL(item.value)}
+                {formatBRL(hoje)}
               </p>
             </div>
-            <span className="text-2xl opacity-70">{item.icon}</span>
-          </Card>
-        </TiltCard>
-      ))}
-
-      <TiltCard maxTilt={6}>
-        <Card className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
-              <EyeToggle hidden={!!hidden.mes} onClick={() => toggle("mes")} />
-            </div>
-            <p
-              className={`mt-1 text-2xl font-semibold ${mes >= 0 ? "text-emerald-400" : "text-red-400"} ${
-                hidden.mes ? "select-none blur-sm" : ""
-              }`}
-            >
-              {formatBRL(mes)}
-            </p>
+            <span className="text-2xl opacity-70">☀️</span>
           </div>
-          {mesPrevHref && mesNextHref ? (
-            <div className="flex flex-col items-end gap-1.5">
-              <div className="flex items-center gap-1">
-                <Link
-                  href={mesPrevHref}
-                  aria-label="Mês anterior"
-                  className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
-                >
-                  ‹
-                </Link>
-                <Link
-                  href={mesNextHref}
-                  aria-label="Próximo mês"
-                  className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
-                >
-                  ›
-                </Link>
+        </Card>
+      </TiltCard>
+
+      <TiltCard maxTilt={6} className="h-full">
+        <Card className="h-full">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm text-neutral-400">Esta semana</p>
+                <EyeToggle hidden={!!hidden.semana} onClick={() => toggle("semana")} />
               </div>
-              {!mesIsCurrent && (
-                <Link href="/dashboard" className="text-xs text-emerald-400 hover:underline">
-                  Hoje
-                </Link>
-              )}
+              <p
+                className={`mt-1 text-2xl font-semibold ${semana >= 0 ? "text-emerald-400" : "text-red-400"} ${
+                  hidden.semana ? "select-none blur-sm" : ""
+                }`}
+              >
+                {formatBRL(semana)}
+              </p>
             </div>
-          ) : (
-            <span className="text-2xl opacity-70">📈</span>
+            <span className="text-2xl opacity-70">📅</span>
+          </div>
+          <GoalProgress
+            current={semana}
+            goal={metaSemanal}
+            fieldName="meta_semanal"
+            otherFieldName="meta_mensal"
+            otherValue={metaMensal}
+          />
+        </Card>
+      </TiltCard>
+
+      <TiltCard maxTilt={6} className="h-full">
+        <Card className="h-full">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
+                <EyeToggle hidden={!!hidden.mes} onClick={() => toggle("mes")} />
+              </div>
+              <p
+                className={`mt-1 text-2xl font-semibold ${mes >= 0 ? "text-emerald-400" : "text-red-400"} ${
+                  hidden.mes ? "select-none blur-sm" : ""
+                }`}
+              >
+                {formatBRL(mes)}
+              </p>
+            </div>
+            {mesPrevHref && mesNextHref ? (
+              <div className="flex flex-col items-end gap-1.5">
+                <div className="flex items-center gap-1">
+                  <Link
+                    href={mesPrevHref}
+                    aria-label="Mês anterior"
+                    className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
+                  >
+                    ‹
+                  </Link>
+                  <Link
+                    href={mesNextHref}
+                    aria-label="Próximo mês"
+                    className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 text-neutral-400 transition-colors hover:border-emerald-500/40 hover:text-neutral-100"
+                  >
+                    ›
+                  </Link>
+                </div>
+                {!mesIsCurrent && (
+                  <Link href="/dashboard" className="text-xs text-emerald-400 hover:underline">
+                    Hoje
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <span className="text-2xl opacity-70">📈</span>
+            )}
+          </div>
+          {mesIsCurrent && (
+            <GoalProgress
+              current={mes}
+              goal={metaMensal}
+              fieldName="meta_mensal"
+              otherFieldName="meta_semanal"
+              otherValue={metaSemanal}
+            />
           )}
         </Card>
       </TiltCard>

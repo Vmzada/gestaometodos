@@ -1,38 +1,53 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { updateDelayEntry, deleteDelayEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { GreenRedToggle } from "@/components/ui/green-red-toggle";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Pagination, PAGE_SIZE } from "@/components/ui/pagination";
 import { formatBRL } from "@/lib/date-helpers";
 import type { DelayEntry } from "@/lib/database.types";
 
 export function DelayEntriesTable({ entries }: { entries: DelayEntry[] }) {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedEntries = useMemo(
+    () => entries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [entries, currentPage],
+  );
+
   if (entries.length === 0) {
     return <p className="text-sm text-neutral-500">Nenhum lançamento neste período.</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[820px] text-sm">
-        <thead>
-          <tr className="border-b border-neutral-800 text-left text-neutral-400">
-            <th className="py-2 pr-3 font-medium">Data</th>
-            <th className="py-2 pr-3 font-medium">Casa de aposta</th>
-            <th className="py-2 pr-3 font-medium">Odd</th>
-            <th className="py-2 pr-3 font-medium">Valor</th>
-            <th className="py-2 pr-3 font-medium">Cliente</th>
-            <th className="py-2 pr-3 font-medium">Parte do cliente</th>
-            <th className="py-2 pr-3 font-medium">Lucro</th>
-            <th className="py-2 pr-3 font-medium"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => (
-            <DelayEntryRow key={entry.id} entry={entry} />
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[820px] text-sm">
+          <thead>
+            <tr className="border-b border-neutral-800 text-left text-neutral-400">
+              <th className="py-2 pr-3 font-medium">Data</th>
+              <th className="py-2 pr-3 font-medium">Casa de aposta</th>
+              <th className="py-2 pr-3 font-medium">Odd</th>
+              <th className="py-2 pr-3 font-medium">Valor</th>
+              <th className="py-2 pr-3 font-medium">Cliente</th>
+              <th className="py-2 pr-3 font-medium">Parte do cliente</th>
+              <th className="py-2 pr-3 font-medium">Lucro</th>
+              <th className="py-2 pr-3 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedEntries.map((entry) => (
+              <DelayEntryRow key={entry.id} entry={entry} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Pagination page={currentPage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }
@@ -42,6 +57,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
   const [deleting, setDeleting] = useState(false);
   const [odd, setOdd] = useState(entry.odd);
   const [valor, setValor] = useState(entry.valor);
+  const [resultado, setResultado] = useState<"green" | "red">(entry.lucro < 0 ? "red" : "green");
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
       try {
@@ -66,13 +82,17 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
   }
 
   if (editing) {
-    const lucroPreview = valor * (odd - 1);
+    const lucroPreview = resultado === "red" ? -valor : valor * (odd - 1);
     return (
       <tr className="border-b border-neutral-900">
         <td colSpan={8} className="py-3">
-          <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-6">
-            <Input name="entry_date" type="date" defaultValue={entry.entry_date} required />
+          <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
+            <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
             <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
+            <div>
+              <Label>Resultado</Label>
+              <GreenRedToggle value={resultado} onChange={setResultado} />
+            </div>
             <Input
               name="odd"
               type="number"
@@ -92,7 +112,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
             />
             <Input name="cliente_nome" placeholder="Cliente (opcional)" defaultValue={entry.cliente_nome ?? ""} />
             <Input name="cliente_parte" type="number" step="0.01" defaultValue={entry.cliente_parte} />
-            <div className="col-span-2 flex items-center gap-4 sm:col-span-6">
+            <div className="col-span-2 flex items-center gap-4 sm:col-span-7">
               <p className="text-sm text-neutral-400">
                 Lucro calculado:{" "}
                 <span
@@ -104,7 +124,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
                 </span>
               </p>
             </div>
-            <div className="col-span-2 flex gap-2 sm:col-span-6">
+            <div className="col-span-2 flex gap-2 sm:col-span-7">
               <Button type="submit" disabled={pending}>
                 {pending ? "Salvando..." : "Salvar"}
               </Button>
@@ -113,7 +133,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
               </Button>
             </div>
             {state.error && (
-              <p className="col-span-2 text-sm text-red-400 sm:col-span-6">{state.error}</p>
+              <p className="col-span-2 text-sm text-red-400 sm:col-span-7">{state.error}</p>
             )}
           </form>
         </td>

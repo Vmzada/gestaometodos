@@ -47,6 +47,7 @@ function parseDelayEntryFields(formData: FormData) {
   const cliente_nome = String(formData.get("cliente_nome") ?? "").trim();
   const cliente_parte_raw = formData.get("cliente_parte");
   const cliente_parte = cliente_parte_raw ? Number(cliente_parte_raw) : 0;
+  const resultado = formData.get("resultado") === "red" ? "red" : "green";
 
   if (
     !entry_date ||
@@ -59,7 +60,7 @@ function parseDelayEntryFields(formData: FormData) {
     return null;
   }
 
-  const lucro = valor * (odd - 1);
+  const lucro = resultado === "red" ? -valor : valor * (odd - 1);
 
   return {
     entry_date,
