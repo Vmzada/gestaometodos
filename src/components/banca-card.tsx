@@ -36,6 +36,19 @@ function TrashIcon() {
   );
 }
 
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-3.5 w-3.5">
+      <path
+        d="M16.5 3.5l4 4L7 21l-4.5 1L3.5 17.5 16.5 3.5Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M14.5 5.5l4 4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function ChevronIcon({ direction }: { direction: "up" | "down" }) {
   return (
     <svg
@@ -224,9 +237,10 @@ export function BancaCard({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="shrink-0 text-xs text-neutral-600 hover:text-neutral-400"
+            className="flex shrink-0 items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-neutral-300 transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
           >
-            editar
+            <PencilIcon />
+            Editar
           </button>
         </div>
       </Card>
