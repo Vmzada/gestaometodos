@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { daysUntil } from "@/lib/date-helpers";
 import { hasActiveSubscription, isTrialActive, getTrialEndsAt } from "@/lib/subscription";
 import { TrialCountdownBanner } from "@/components/trial-countdown-banner";
+import { WelcomeGreeting } from "@/components/welcome-greeting";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -14,13 +15,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let expiryBanner: string | null = null;
   let trialEndsAt: string | null = null;
   let subscriptionDaysLeft: number | null = null;
+  let firstName: string | null = null;
 
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_status, subscription_expires_at, trial_started_at")
+      .select("subscription_status, subscription_expires_at, trial_started_at, full_name")
       .eq("id", user.id)
       .single();
+
+    firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? null;
 
     if (profile && !hasActiveSubscription(profile) && isTrialActive(profile)) {
       trialEndsAt = getTrialEndsAt(profile)!.toISOString();
@@ -40,6 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="bg-mesh relative min-h-screen bg-neutral-950">
       <div className="bg-grid pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
       <div className="relative">
+        {user && firstName && <WelcomeGreeting userId={user.id} firstName={firstName} />}
         <Navbar subscriptionDaysLeft={subscriptionDaysLeft} />
         {trialEndsAt && <TrialCountdownBanner endsAt={trialEndsAt} />}
         {!trialEndsAt && expiryBanner && (
