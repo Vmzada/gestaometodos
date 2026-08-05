@@ -4,11 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 import { updateFullName } from "@/app/(dashboard)/dashboard/profile-actions";
 
 const MESSAGES = [
-  "Cada lançamento registrado é um passo a mais no controle da sua banca. Bora manter a disciplina hoje.",
-  "Gestão de banca é o que separa quem joga por sorte de quem joga por estratégia. Continue registrando tudo.",
-  "Um dia de cada vez: anote seus lançamentos e deixe os números te mostrarem o caminho.",
-  "A disciplina de hoje é o lucro de amanhã. Vamos organizar sua banca?",
-  "Quem controla os números, controla o jogo. Bora dar uma olhada nos seus lançamentos.",
+  "Cuidar do seu dinheiro hoje é garantir tranquilidade amanhã. Vamos organizar tudo?",
+  "Organização financeira não é sorte, é hábito. Continue registrando cada lançamento.",
+  "Quem organiza o dinheiro, no fim do mês, colhe o resultado. Bora cuidar da sua grana?",
+  "Cada real registrado é um passo mais perto do controle total das suas finanças.",
+  "Dinheiro organizado é liberdade no futuro. Continue firme nos seus registros.",
 ];
 
 export function WelcomeGreeting({
