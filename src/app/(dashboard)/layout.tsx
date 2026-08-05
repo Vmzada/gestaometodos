@@ -44,7 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="bg-mesh relative min-h-screen bg-neutral-950">
       <div className="bg-grid pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
       <div className="relative">
-        {user && firstName && <WelcomeGreeting userId={user.id} firstName={firstName} />}
+        {user && <WelcomeGreeting userId={user.id} firstName={firstName} />}
         <Navbar subscriptionDaysLeft={subscriptionDaysLeft} />
         {trialEndsAt && <TrialCountdownBanner endsAt={trialEndsAt} />}
         {!trialEndsAt && expiryBanner && (
