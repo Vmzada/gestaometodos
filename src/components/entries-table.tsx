@@ -31,7 +31,7 @@ export function EntriesTable({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[920px] text-sm">
+        <table className="w-full min-w-[1040px] text-sm">
           <thead>
             <tr className="border-b border-neutral-800 text-left text-neutral-400">
               <th className="py-2 pr-3 font-medium">Data</th>
@@ -42,6 +42,7 @@ export function EntriesTable({
               <th className="py-2 pr-3 font-medium">Saque</th>
               <th className="py-2 pr-3 font-medium">CPA</th>
               <th className="py-2 pr-3 font-medium">Lucro</th>
+              <th className="py-2 pr-3 font-medium">Lembrete</th>
               <th className="py-2 pr-3 font-medium"></th>
             </tr>
           </thead>
@@ -91,7 +92,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
     const lucroPreview = saque - deposito - clienteParte + cpa;
     return (
       <tr className="border-b border-neutral-900">
-        <td colSpan={9} className="py-3">
+        <td colSpan={10} className="py-3">
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
             <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
             <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
@@ -126,6 +127,12 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
               step="0.01"
               defaultValue={entry.cpa}
               onChange={(e) => setCpa(Number(e.target.value) || 0)}
+            />
+            <Input
+              name="nota"
+              defaultValue={entry.nota ?? ""}
+              placeholder="Lembrete — opcional"
+              className="col-span-2 sm:col-span-7"
             />
             <div className="col-span-2 flex items-center gap-4 sm:col-span-7">
               <p className="text-sm text-neutral-400">
@@ -169,6 +176,9 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
         className={`py-2 pr-3 font-medium ${entry.lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}
       >
         {formatBRL(entry.lucro)}
+      </td>
+      <td className="max-w-[160px] truncate py-2 pr-3 text-neutral-400" title={entry.nota ?? undefined}>
+        {entry.nota || "—"}
       </td>
       <td className="py-2 pr-3">
         <div className="flex gap-2">

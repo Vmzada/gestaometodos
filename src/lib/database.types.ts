@@ -60,6 +60,7 @@ export type Database = {
           saque: number;
           cpa: number;
           lucro: number;
+          nota: string | null;
           created_at: string;
         };
         Insert: {
@@ -73,6 +74,7 @@ export type Database = {
           saque: number;
           cpa?: number;
           lucro: number;
+          nota?: string | null;
         };
         Update: {
           entry_date?: string;
@@ -83,6 +85,7 @@ export type Database = {
           saque?: number;
           cpa?: number;
           lucro?: number;
+          nota?: string | null;
         };
         Relationships: [];
       };

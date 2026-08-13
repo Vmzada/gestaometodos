@@ -121,6 +121,15 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
           onChange={(e) => setCpa(Number(e.target.value) || 0)}
         />
       </div>
+      <div className="col-span-2 sm:col-span-7">
+        <Label htmlFor="nota">Lembrete — opcional</Label>
+        <Input
+          id="nota"
+          name="nota"
+          placeholder="Ex: o que você fez nesse lançamento"
+          disabled={readOnly}
+        />
+      </div>
       <div className="col-span-2 flex items-end justify-between gap-4 sm:col-span-7">
         <p className="text-sm text-neutral-400">
           Lucro calculado:{" "}

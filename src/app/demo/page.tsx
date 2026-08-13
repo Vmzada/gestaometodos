@@ -24,6 +24,7 @@ const FAKE_ENTRIES: Entry[] = [
     saque: 620.5,
     cpa: 0,
     lucro: 75.5,
+    nota: null,
     created_at: NOW_ISO,
   },
   {
@@ -37,6 +38,7 @@ const FAKE_ENTRIES: Entry[] = [
     saque: 380,
     cpa: 0,
     lucro: 50,
+    nota: null,
     created_at: NOW_ISO,
   },
   {
@@ -50,6 +52,7 @@ const FAKE_ENTRIES: Entry[] = [
     saque: 265.75,
     cpa: 50,
     lucro: 90.75,
+    nota: null,
     created_at: NOW_ISO,
   },
 ];
