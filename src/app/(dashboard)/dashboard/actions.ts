@@ -76,6 +76,7 @@ function parseDelayEntryFields(formData: FormData) {
 function revalidateDashboard() {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/calendario");
+  revalidatePath("/dashboard/estatisticas");
 }
 
 type FormState = { error: string | null };
