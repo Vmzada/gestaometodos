@@ -62,13 +62,12 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
         />
       </div>
       <div>
-        <Label htmlFor="cliente_nome">Cliente</Label>
+        <Label htmlFor="cliente_nome">Cliente — opcional</Label>
         <Input
           id="cliente_nome"
           name="cliente_nome"
           placeholder="Nome do cliente"
           disabled={readOnly}
-          required
         />
       </div>
       <div>

@@ -25,7 +25,6 @@ function parseEntryFields(formData: FormData) {
   if (
     !entry_date ||
     !casa_aposta ||
-    !cliente_nome ||
     Number.isNaN(cliente_parte) ||
     Number.isNaN(deposito) ||
     Number.isNaN(saque) ||

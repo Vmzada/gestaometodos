@@ -95,7 +95,7 @@ function EntryRow({ entry, readOnly = false }: { entry: Entry; readOnly?: boolea
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
             <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
             <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
-            <Input name="cliente_nome" defaultValue={entry.cliente_nome} required />
+            <Input name="cliente_nome" defaultValue={entry.cliente_nome} />
             <Input
               name="cliente_parte"
               type="number"
