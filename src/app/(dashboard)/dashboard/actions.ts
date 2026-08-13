@@ -21,8 +21,6 @@ function parseEntryFields(formData: FormData) {
   const saque = Number(formData.get("saque"));
   const cpaRaw = formData.get("cpa");
   const cpa = cpaRaw ? Number(cpaRaw) : 0;
-  const notaRaw = String(formData.get("nota") ?? "").trim();
-  const nota = notaRaw || null;
 
   if (
     !entry_date ||
@@ -37,7 +35,7 @@ function parseEntryFields(formData: FormData) {
 
   const lucro = saque - deposito - cliente_parte + cpa;
 
-  return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, cpa, lucro, nota };
+  return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, cpa, lucro };
 }
 
 function parseDelayEntryFields(formData: FormData) {
