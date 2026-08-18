@@ -129,8 +129,6 @@ export type Database = {
           categoria: string;
           descricao: string | null;
           valor: number;
-          via_pix: boolean;
-          pix_nome: string | null;
           created_at: string;
         };
         Insert: {
@@ -140,16 +138,12 @@ export type Database = {
           categoria: string;
           descricao?: string | null;
           valor: number;
-          via_pix?: boolean;
-          pix_nome?: string | null;
         };
         Update: {
           gasto_date?: string;
           categoria?: string;
           descricao?: string | null;
           valor?: number;
-          via_pix?: boolean;
-          pix_nome?: string | null;
         };
         Relationships: [];
       };

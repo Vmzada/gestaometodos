@@ -85,15 +85,12 @@ function parseGastoFields(formData: FormData) {
   const descricaoRaw = String(formData.get("descricao") ?? "").trim();
   const descricao = descricaoRaw || null;
   const valor = Number(formData.get("valor"));
-  const via_pix = formData.get("via_pix") === "on";
-  const pixNomeRaw = String(formData.get("pix_nome") ?? "").trim();
-  const pix_nome = via_pix ? pixNomeRaw || null : null;
 
   if (!gasto_date || !categoria || Number.isNaN(valor)) {
     return null;
   }
 
-  return { gasto_date, categoria, descricao, valor, via_pix, pix_nome };
+  return { gasto_date, categoria, descricao, valor };
 }
 
 type FormState = { error: string | null };
