@@ -121,6 +121,32 @@ export type Database = {
         };
         Relationships: [];
       };
+      gastos: {
+        Row: {
+          id: string;
+          user_id: string;
+          gasto_date: string;
+          categoria: string;
+          descricao: string | null;
+          valor: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          gasto_date: string;
+          categoria: string;
+          descricao?: string | null;
+          valor: number;
+        };
+        Update: {
+          gasto_date?: string;
+          categoria?: string;
+          descricao?: string | null;
+          valor?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -132,3 +158,4 @@ export type Database = {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Entry = Database["public"]["Tables"]["entries"]["Row"];
 export type DelayEntry = Database["public"]["Tables"]["delay_entries"]["Row"];
+export type Gasto = Database["public"]["Tables"]["gastos"]["Row"];

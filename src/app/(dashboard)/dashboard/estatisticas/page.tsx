@@ -34,7 +34,7 @@ export default async function EstatisticasPage() {
   const rangeStart = `${buckets[0].year}-${String(buckets[0].month + 1).padStart(2, "0")}-01`;
   const rangeEnd = toISODate(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)));
 
-  const [entriesRes, delayRes] = await Promise.all([
+  const [entriesRes, delayRes, gastosRes] = await Promise.all([
     supabase
       .from("entries")
       .select("entry_date, deposito, cliente_parte, cpa, lucro")
@@ -47,11 +47,18 @@ export default async function EstatisticasPage() {
       .eq("user_id", user!.id)
       .gte("entry_date", rangeStart)
       .lte("entry_date", rangeEnd),
+    supabase
+      .from("gastos")
+      .select("gasto_date, valor")
+      .eq("user_id", user!.id)
+      .gte("gasto_date", rangeStart)
+      .lte("gasto_date", rangeEnd),
   ]);
 
-  type Bucket = { deposito: number; clienteParte: number; cpa: number; lucro: number };
+  type Bucket = { deposito: number; clienteParte: number; cpa: number; lucro: number; gastos: number };
   const byMonth = new Map<string, Bucket>();
-  for (const b of buckets) byMonth.set(b.key, { deposito: 0, clienteParte: 0, cpa: 0, lucro: 0 });
+  for (const b of buckets)
+    byMonth.set(b.key, { deposito: 0, clienteParte: 0, cpa: 0, lucro: 0, gastos: 0 });
 
   for (const row of entriesRes.data ?? []) {
     const bucket = byMonth.get(row.entry_date.slice(0, 7));
@@ -66,6 +73,11 @@ export default async function EstatisticasPage() {
     if (!bucket) continue;
     bucket.lucro += Number(row.lucro);
   }
+  for (const row of gastosRes.data ?? []) {
+    const bucket = byMonth.get(row.gasto_date.slice(0, 7));
+    if (!bucket) continue;
+    bucket.gastos += Number(row.valor);
+  }
 
   const months = buckets.map((b) => ({ ...b, ...byMonth.get(b.key)! }));
 
@@ -75,15 +87,23 @@ export default async function EstatisticasPage() {
       clienteParte: acc.clienteParte + m.clienteParte,
       cpa: acc.cpa + m.cpa,
       lucro: acc.lucro + m.lucro,
+      gastos: acc.gastos + m.gastos,
     }),
-    { deposito: 0, clienteParte: 0, cpa: 0, lucro: 0 },
+    { deposito: 0, clienteParte: 0, cpa: 0, lucro: 0, gastos: 0 },
   );
+  const lucroLiquido = totals.lucro - totals.gastos;
 
   const tiles = [
     { label: "Lucro (12 meses)", value: totals.lucro, tone: totals.lucro >= 0 ? "good" : "bad" },
     { label: "Investido (depósito)", value: totals.deposito, tone: "neutral" },
     { label: "Dado ao cliente", value: totals.clienteParte, tone: "neutral" },
     { label: "CPA recebido", value: totals.cpa, tone: "neutral" },
+    { label: "Gastos (12 meses)", value: totals.gastos, tone: "neutral" },
+    {
+      label: "Lucro líquido (após gastos)",
+      value: lucroLiquido,
+      tone: lucroLiquido >= 0 ? "good" : "bad",
+    },
   ] as const;
 
   return (
@@ -111,7 +131,7 @@ export default async function EstatisticasPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((tile) => (
           <TiltCard key={tile.label} maxTilt={6}>
             <Card>
@@ -157,7 +177,7 @@ export default async function EstatisticasPage() {
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-neutral-100">Tabela mensal</h2>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
+          <table className="w-full min-w-[820px] text-sm">
             <thead>
               <tr className="border-b border-neutral-800 text-left text-neutral-400">
                 <th className="py-2 pr-3 font-medium">Mês</th>
@@ -165,20 +185,29 @@ export default async function EstatisticasPage() {
                 <th className="py-2 pr-3 font-medium">Parte do cliente</th>
                 <th className="py-2 pr-3 font-medium">CPA</th>
                 <th className="py-2 pr-3 font-medium">Lucro</th>
+                <th className="py-2 pr-3 font-medium">Gastos</th>
+                <th className="py-2 pr-3 font-medium">Lucro líquido</th>
               </tr>
             </thead>
             <tbody>
-              {months.map((m) => (
-                <tr key={m.key} className="border-b border-neutral-900 text-neutral-200">
-                  <td className="py-2 pr-3">{m.label}</td>
-                  <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.deposito)}</td>
-                  <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.clienteParte)}</td>
-                  <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.cpa)}</td>
-                  <td className={`py-2 pr-3 font-medium ${m.lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                    {formatBRL(m.lucro)}
-                  </td>
-                </tr>
-              ))}
+              {months.map((m) => {
+                const liquido = m.lucro - m.gastos;
+                return (
+                  <tr key={m.key} className="border-b border-neutral-900 text-neutral-200">
+                    <td className="py-2 pr-3">{m.label}</td>
+                    <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.deposito)}</td>
+                    <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.clienteParte)}</td>
+                    <td className="py-2 pr-3 text-neutral-400">{formatBRL(m.cpa)}</td>
+                    <td className={`py-2 pr-3 font-medium ${m.lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {formatBRL(m.lucro)}
+                    </td>
+                    <td className="py-2 pr-3 text-red-400">{m.gastos ? formatBRL(m.gastos) : "—"}</td>
+                    <td className={`py-2 pr-3 font-medium ${liquido >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {formatBRL(liquido)}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

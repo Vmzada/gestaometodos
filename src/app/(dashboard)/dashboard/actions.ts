@@ -76,6 +76,21 @@ function revalidateDashboard() {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/calendario");
   revalidatePath("/dashboard/estatisticas");
+  revalidatePath("/dashboard/gastos");
+}
+
+function parseGastoFields(formData: FormData) {
+  const gasto_date = String(formData.get("gasto_date") ?? "");
+  const categoria = String(formData.get("categoria") ?? "").trim();
+  const descricaoRaw = String(formData.get("descricao") ?? "").trim();
+  const descricao = descricaoRaw || null;
+  const valor = Number(formData.get("valor"));
+
+  if (!gasto_date || !categoria || Number.isNaN(valor)) {
+    return null;
+  }
+
+  return { gasto_date, categoria, descricao, valor };
 }
 
 type FormState = { error: string | null };
@@ -140,6 +155,37 @@ export async function updateDelayEntry(id: string, formData: FormData) {
 export async function deleteDelayEntry(id: string) {
   const { supabase } = await requireUser();
   const { error } = await supabase.from("delay_entries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function createGasto(_prevState: FormState, formData: FormData): Promise<FormState> {
+  const { supabase, user } = await requireUser();
+  const fields = parseGastoFields(formData);
+  if (!fields) return { error: "Preencha todos os campos corretamente." };
+
+  const { error } = await supabase.from("gastos").insert({ user_id: user.id, ...fields });
+  if (error) return { error: error.message };
+
+  revalidateDashboard();
+  return { error: null };
+}
+
+export async function updateGasto(id: string, formData: FormData) {
+  const { supabase } = await requireUser();
+  const fields = parseGastoFields(formData);
+  if (!fields) throw new Error("Preencha todos os campos corretamente.");
+
+  const { error } = await supabase.from("gastos").update(fields).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function deleteGasto(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("gastos").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidateDashboard();
