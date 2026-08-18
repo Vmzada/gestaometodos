@@ -32,6 +32,7 @@ export function GastosTable({ gastos }: { gastos: Gasto[] }) {
               <th className="py-2 pr-3 font-medium">Categoria</th>
               <th className="py-2 pr-3 font-medium">Descrição</th>
               <th className="py-2 pr-3 font-medium">Valor</th>
+              <th className="py-2 pr-3 font-medium">Pix</th>
               <th className="py-2 pr-3 font-medium"></th>
             </tr>
           </thead>
@@ -50,6 +51,7 @@ export function GastosTable({ gastos }: { gastos: Gasto[] }) {
 function GastoRow({ gasto }: { gasto: Gasto }) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [viaPix, setViaPix] = useState(gasto.via_pix);
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
       try {
@@ -76,7 +78,7 @@ function GastoRow({ gasto }: { gasto: Gasto }) {
   if (editing) {
     return (
       <tr className="border-b border-neutral-900">
-        <td colSpan={5} className="py-3">
+        <td colSpan={6} className="py-3">
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             <DatePicker name="gasto_date" defaultValue={gasto.gasto_date} required />
             <Input name="categoria" defaultValue={gasto.categoria} required />
@@ -93,6 +95,27 @@ function GastoRow({ gasto }: { gasto: Gasto }) {
               placeholder="Descrição — opcional"
               className="col-span-2 sm:col-span-2"
             />
+            <div className="col-span-2 flex items-center gap-2 sm:col-span-5">
+              <input
+                id={`via_pix_${gasto.id}`}
+                name="via_pix"
+                type="checkbox"
+                checked={viaPix}
+                onChange={(e) => setViaPix(e.target.checked)}
+                className="h-4 w-4 rounded border-white/20 bg-neutral-900 accent-emerald-500"
+              />
+              <label htmlFor={`via_pix_${gasto.id}`} className="text-sm text-neutral-300">
+                Pago via Pix
+              </label>
+            </div>
+            {viaPix && (
+              <Input
+                name="pix_nome"
+                defaultValue={gasto.pix_nome ?? ""}
+                placeholder="Nome da pessoa — opcional"
+                className="col-span-2 sm:col-span-3"
+              />
+            )}
             <div className="col-span-2 flex gap-2 sm:col-span-5">
               <Button type="submit" disabled={pending}>
                 {pending ? "Salvando..." : "Salvar"}
@@ -116,6 +139,9 @@ function GastoRow({ gasto }: { gasto: Gasto }) {
       <td className="py-2 pr-3">{gasto.categoria}</td>
       <td className="py-2 pr-3 text-neutral-400">{gasto.descricao || "—"}</td>
       <td className="py-2 pr-3 font-medium text-red-400">{formatBRL(gasto.valor)}</td>
+      <td className="py-2 pr-3 text-neutral-400">
+        {gasto.via_pix ? gasto.pix_nome || "Sim" : "—"}
+      </td>
       <td className="py-2 pr-3">
         <div className="flex gap-2">
           <Button variant="ghost" onClick={() => setEditing(true)}>

@@ -13,6 +13,7 @@ const CATEGORIAS_SUGERIDAS = ["Água", "Luz", "Internet", "Mercado", "Aluguel", 
 export function GastoForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [viaPix, setViaPix] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const dateRef = useRef<DatePickerHandle>(null);
 
@@ -26,6 +27,7 @@ export function GastoForm() {
       setError(null);
       formRef.current?.reset();
       dateRef.current?.reset();
+      setViaPix(false);
     });
   }
 
@@ -58,6 +60,25 @@ export function GastoForm() {
         <Label htmlFor="descricao">Descrição — opcional</Label>
         <Input id="descricao" name="descricao" placeholder="Detalhes do gasto" />
       </div>
+      <div className="col-span-2 flex items-center gap-2 sm:col-span-5">
+        <input
+          id="via_pix"
+          name="via_pix"
+          type="checkbox"
+          checked={viaPix}
+          onChange={(e) => setViaPix(e.target.checked)}
+          className="h-4 w-4 rounded border-white/20 bg-neutral-900 accent-emerald-500"
+        />
+        <Label htmlFor="via_pix" className="!mb-0">
+          Pago via Pix
+        </Label>
+      </div>
+      {viaPix && (
+        <div className="col-span-2 sm:col-span-3">
+          <Label htmlFor="pix_nome">Nome da pessoa — opcional</Label>
+          <Input id="pix_nome" name="pix_nome" placeholder="Quem recebeu o Pix" />
+        </div>
+      )}
       <div className="col-span-2 flex items-end sm:col-span-5">
         {error && <p className="mb-2 mr-4 text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={pending}>
