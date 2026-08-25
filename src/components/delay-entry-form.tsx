@@ -14,6 +14,7 @@ export function DelayEntryForm() {
   const [pending, startTransition] = useTransition();
   const [odd, setOdd] = useState(0);
   const [valor, setValor] = useState(0);
+  const [clienteParte, setClienteParte] = useState(0);
   const [resultado, setResultado] = useState<"green" | "red">("green");
   const formRef = useRef<HTMLFormElement>(null);
   const dateRef = useRef<DatePickerHandle>(null);
@@ -30,11 +31,12 @@ export function DelayEntryForm() {
       dateRef.current?.reset();
       setOdd(0);
       setValor(0);
+      setClienteParte(0);
       setResultado("green");
     });
   }
 
-  const lucro = resultado === "red" ? -valor : valor * (odd - 1);
+  const lucro = (resultado === "red" ? -valor : valor * (odd - 1)) - clienteParte;
 
   return (
     <form ref={formRef} action={handleSubmit} className="grid grid-cols-2 gap-3 sm:grid-cols-7">
@@ -87,7 +89,14 @@ export function DelayEntryForm() {
       </div>
       <div>
         <Label htmlFor="delay_cliente_parte">Parte do cliente (R$)</Label>
-        <Input id="delay_cliente_parte" name="cliente_parte" type="number" step="0.01" defaultValue="0" />
+        <Input
+          id="delay_cliente_parte"
+          name="cliente_parte"
+          type="number"
+          step="0.01"
+          defaultValue="0"
+          onChange={(e) => setClienteParte(Number(e.target.value) || 0)}
+        />
       </div>
       <div className="col-span-2 flex items-end justify-between gap-4 sm:col-span-7">
         <p className="text-sm text-neutral-400">

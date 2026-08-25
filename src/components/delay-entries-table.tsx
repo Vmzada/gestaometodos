@@ -57,6 +57,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
   const [deleting, setDeleting] = useState(false);
   const [odd, setOdd] = useState(entry.odd);
   const [valor, setValor] = useState(entry.valor);
+  const [clienteParte, setClienteParte] = useState(entry.cliente_parte);
   const [resultado, setResultado] = useState<"green" | "red">(entry.lucro < 0 ? "red" : "green");
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
@@ -82,7 +83,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
   }
 
   if (editing) {
-    const lucroPreview = resultado === "red" ? -valor : valor * (odd - 1);
+    const lucroPreview = (resultado === "red" ? -valor : valor * (odd - 1)) - clienteParte;
     return (
       <tr className="border-b border-neutral-900">
         <td colSpan={8} className="py-3">
@@ -111,7 +112,13 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
               onChange={(e) => setValor(Number(e.target.value) || 0)}
             />
             <Input name="cliente_nome" placeholder="Cliente (opcional)" defaultValue={entry.cliente_nome ?? ""} />
-            <Input name="cliente_parte" type="number" step="0.01" defaultValue={entry.cliente_parte} />
+            <Input
+              name="cliente_parte"
+              type="number"
+              step="0.01"
+              defaultValue={entry.cliente_parte}
+              onChange={(e) => setClienteParte(Number(e.target.value) || 0)}
+            />
             <div className="col-span-2 flex items-center gap-4 sm:col-span-7">
               <p className="text-sm text-neutral-400">
                 Lucro calculado:{" "}

@@ -59,7 +59,7 @@ function parseDelayEntryFields(formData: FormData) {
     return null;
   }
 
-  const lucro = resultado === "red" ? -valor : valor * (odd - 1);
+  const lucro = (resultado === "red" ? -valor : valor * (odd - 1)) - cliente_parte;
 
   return {
     entry_date,
