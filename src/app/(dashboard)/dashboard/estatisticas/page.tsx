@@ -43,7 +43,7 @@ export default async function EstatisticasPage() {
       .lte("entry_date", rangeEnd),
     supabase
       .from("delay_entries")
-      .select("entry_date, lucro")
+      .select("entry_date, cliente_parte, lucro")
       .eq("user_id", user!.id)
       .gte("entry_date", rangeStart)
       .lte("entry_date", rangeEnd),
@@ -71,6 +71,7 @@ export default async function EstatisticasPage() {
   for (const row of delayRes.data ?? []) {
     const bucket = byMonth.get(row.entry_date.slice(0, 7));
     if (!bucket) continue;
+    bucket.clienteParte += Number(row.cliente_parte);
     bucket.lucro += Number(row.lucro);
   }
   for (const row of gastosRes.data ?? []) {
