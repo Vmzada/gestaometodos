@@ -1,7 +1,12 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { updateDelayEntry, deleteDelayEntry } from "@/app/(dashboard)/dashboard/actions";
+import {
+  updateDelayEntry,
+  deleteDelayEntry,
+  updateErroEntry,
+  deleteErroEntry,
+} from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +14,29 @@ import { GreenRedToggle } from "@/components/ui/green-red-toggle";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Pagination, PAGE_SIZE } from "@/components/ui/pagination";
 import { formatBRL } from "@/lib/date-helpers";
-import type { DelayEntry } from "@/lib/database.types";
+import type { Mercado, MarketEntry } from "@/lib/mercados";
 
-export function DelayEntriesTable({ entries }: { entries: DelayEntry[] }) {
+const UPDATE_ACTION = {
+  delay: updateDelayEntry,
+  erro: updateErroEntry,
+};
+
+const DELETE_ACTION = {
+  delay: deleteDelayEntry,
+  erro: deleteErroEntry,
+};
+
+/**
+ * Tabela de lançamentos dos mercados esportivos (delay e erro). As colunas são
+ * as mesmas nos dois; só muda a tabela onde o lançamento é salvo.
+ */
+export function MarketEntriesTable({
+  mercado,
+  entries,
+}: {
+  mercado: Mercado;
+  entries: MarketEntry[];
+}) {
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -42,7 +67,7 @@ export function DelayEntriesTable({ entries }: { entries: DelayEntry[] }) {
           </thead>
           <tbody>
             {paginatedEntries.map((entry) => (
-              <DelayEntryRow key={entry.id} entry={entry} />
+              <MarketEntryRow key={entry.id} mercado={mercado} entry={entry} />
             ))}
           </tbody>
         </table>
@@ -52,7 +77,7 @@ export function DelayEntriesTable({ entries }: { entries: DelayEntry[] }) {
   );
 }
 
-function DelayEntryRow({ entry }: { entry: DelayEntry }) {
+function MarketEntryRow({ mercado, entry }: { mercado: Mercado; entry: MarketEntry }) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [odd, setOdd] = useState(entry.odd);
@@ -62,7 +87,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
   const [state, formAction, pending] = useActionState(
     async (_prev: { error: string | null }, formData: FormData) => {
       try {
-        await updateDelayEntry(entry.id, formData);
+        await UPDATE_ACTION[mercado](entry.id, formData);
         setEditing(false);
         return { error: null };
       } catch (err) {
@@ -76,7 +101,7 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
     if (!confirm("Excluir este lançamento?")) return;
     setDeleting(true);
     try {
-      await deleteDelayEntry(entry.id);
+      await DELETE_ACTION[mercado](entry.id);
     } finally {
       setDeleting(false);
     }
@@ -111,7 +136,11 @@ function DelayEntryRow({ entry }: { entry: DelayEntry }) {
               required
               onChange={(e) => setValor(Number(e.target.value) || 0)}
             />
-            <Input name="cliente_nome" placeholder="Cliente (opcional)" defaultValue={entry.cliente_nome ?? ""} />
+            <Input
+              name="cliente_nome"
+              placeholder="Cliente (opcional)"
+              defaultValue={entry.cliente_nome ?? ""}
+            />
             <Input
               name="cliente_parte"
               type="number"

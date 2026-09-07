@@ -121,6 +121,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      erro_entries: {
+        Row: {
+          id: string;
+          user_id: string;
+          entry_date: string;
+          casa_aposta: string;
+          odd: number;
+          valor: number;
+          cliente_nome: string | null;
+          cliente_parte: number;
+          lucro: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          entry_date: string;
+          casa_aposta: string;
+          odd: number;
+          valor: number;
+          cliente_nome?: string | null;
+          cliente_parte?: number;
+          lucro: number;
+        };
+        Update: {
+          entry_date?: string;
+          casa_aposta?: string;
+          odd?: number;
+          valor?: number;
+          cliente_nome?: string | null;
+          cliente_parte?: number;
+          lucro?: number;
+        };
+        Relationships: [];
+      };
       gastos: {
         Row: {
           id: string;
@@ -158,4 +193,5 @@ export type Database = {
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Entry = Database["public"]["Tables"]["entries"]["Row"];
 export type DelayEntry = Database["public"]["Tables"]["delay_entries"]["Row"];
+export type ErroEntry = Database["public"]["Tables"]["erro_entries"]["Row"];
 export type Gasto = Database["public"]["Tables"]["gastos"]["Row"];

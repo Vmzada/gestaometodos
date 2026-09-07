@@ -38,7 +38,9 @@ function parseEntryFields(formData: FormData) {
   return { entry_date, casa_aposta, cliente_nome, cliente_parte, deposito, saque, cpa, lucro };
 }
 
-function parseDelayEntryFields(formData: FormData) {
+// Delay e erro têm exatamente os mesmos campos e a mesma fórmula de lucro,
+// então dividem o parser.
+function parseMarketEntryFields(formData: FormData) {
   const entry_date = String(formData.get("entry_date") ?? "");
   const casa_aposta = String(formData.get("casa_aposta") ?? "").trim();
   const odd = Number(formData.get("odd"));
@@ -131,7 +133,7 @@ export async function createDelayEntry(
   formData: FormData,
 ): Promise<FormState> {
   const { supabase, user } = await requireUser();
-  const fields = parseDelayEntryFields(formData);
+  const fields = parseMarketEntryFields(formData);
   if (!fields) return { error: "Preencha todos os campos corretamente." };
 
   const { error } = await supabase.from("delay_entries").insert({ user_id: user.id, ...fields });
@@ -143,7 +145,7 @@ export async function createDelayEntry(
 
 export async function updateDelayEntry(id: string, formData: FormData) {
   const { supabase } = await requireUser();
-  const fields = parseDelayEntryFields(formData);
+  const fields = parseMarketEntryFields(formData);
   if (!fields) throw new Error("Preencha todos os campos corretamente.");
 
   const { error } = await supabase.from("delay_entries").update(fields).eq("id", id);
@@ -155,6 +157,40 @@ export async function updateDelayEntry(id: string, formData: FormData) {
 export async function deleteDelayEntry(id: string) {
   const { supabase } = await requireUser();
   const { error } = await supabase.from("delay_entries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function createErroEntry(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const { supabase, user } = await requireUser();
+  const fields = parseMarketEntryFields(formData);
+  if (!fields) return { error: "Preencha todos os campos corretamente." };
+
+  const { error } = await supabase.from("erro_entries").insert({ user_id: user.id, ...fields });
+  if (error) return { error: error.message };
+
+  revalidateDashboard();
+  return { error: null };
+}
+
+export async function updateErroEntry(id: string, formData: FormData) {
+  const { supabase } = await requireUser();
+  const fields = parseMarketEntryFields(formData);
+  if (!fields) throw new Error("Preencha todos os campos corretamente.");
+
+  const { error } = await supabase.from("erro_entries").update(fields).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function deleteErroEntry(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("erro_entries").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidateDashboard();

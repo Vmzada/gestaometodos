@@ -1,9 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { EntryForm } from "@/components/entry-form";
 import { EntriesTable } from "@/components/entries-table";
-import { DelayEntryForm } from "@/components/delay-entry-form";
-import { DelayEntriesTable } from "@/components/delay-entries-table";
+import { MarketEntryForm } from "@/components/market-entry-form";
+import { MarketEntriesTable } from "@/components/market-entries-table";
 import { DashboardTabs } from "@/components/dashboard-tabs";
+import { MERCADOS, parseAba } from "@/lib/mercados";
 import { SummaryCards } from "@/components/summary-cards";
 import { BancaCard } from "@/components/banca-card";
 import { Card } from "@/components/ui/card";
@@ -25,8 +26,10 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ data?: string; aba?: string; mes?: string }>;
 }) {
-  const { data: selectedDate, aba, mes: mesParam } = await searchParams;
-  const isDelay = aba === "delay";
+  const { data: selectedDate, aba: abaParam, mes: mesParam } = await searchParams;
+  const aba = parseAba(abaParam);
+  // Método é a aba padrão; as outras são mercados esportivos (delay, erro).
+  const mercado = aba === "metodo" ? null : aba;
   const supabase = await createClient();
   const {
     data: { user },
@@ -46,8 +49,9 @@ export default async function DashboardPage({
   const isCurrentMonth =
     selYear === now.getUTCFullYear() && selMonth - 1 === now.getUTCMonth();
   const mesLabel = `${MESES_PT[selMonth - 1]} de ${selYear}`;
-  const mesPrevHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth - 2, 1)))}`;
-  const mesNextHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth, 1)))}`;
+  const abaQuery = mercado ? `&aba=${mercado}` : "";
+  const mesPrevHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth - 2, 1)))}${abaQuery}`;
+  const mesNextHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth, 1)))}${abaQuery}`;
 
   const listQuery = selectedDate
     ? supabase.from("entries").select("*").eq("user_id", user!.id).eq("entry_date", selectedDate)
@@ -69,6 +73,17 @@ export default async function DashboardPage({
     .order("entry_date", { ascending: false })
     .order("created_at", { ascending: false });
 
+  const erroListQuery = supabase
+    .from("erro_entries")
+    .select("*")
+    .eq("user_id", user!.id)
+    .gte("entry_date", month.start)
+    .lte("entry_date", month.end)
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  const empty = Promise.resolve({ data: [] });
+
   const [
     hojeRes,
     semanaRes,
@@ -76,8 +91,12 @@ export default async function DashboardPage({
     delayHojeRes,
     delaySemanaRes,
     delayMesRes,
+    erroHojeRes,
+    erroSemanaRes,
+    erroMesRes,
     listRes,
     delayListRes,
+    erroListRes,
     profileRes,
   ] = await Promise.all([
     supabase.from("entries").select("lucro").eq("user_id", user!.id).eq("entry_date", today),
@@ -110,14 +129,32 @@ export default async function DashboardPage({
       .eq("user_id", user!.id)
       .gte("entry_date", month.start)
       .lte("entry_date", month.end),
-    isDelay ? Promise.resolve({ data: [] }) : listQuery,
-    isDelay ? delayListQuery : Promise.resolve({ data: [] }),
+    supabase
+      .from("erro_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .eq("entry_date", today),
+    supabase
+      .from("erro_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .gte("entry_date", week.start)
+      .lte("entry_date", week.end),
+    supabase
+      .from("erro_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .gte("entry_date", month.start)
+      .lte("entry_date", month.end),
+    mercado ? empty : listQuery,
+    mercado === "delay" ? delayListQuery : empty,
+    mercado === "erro" ? erroListQuery : empty,
     supabase.from("profiles").select("meta_semanal, meta_mensal, banca_inicial").eq("id", user!.id).single(),
   ]);
 
-  const hoje = sum(hojeRes.data) + sum(delayHojeRes.data);
-  const semana = sum(semanaRes.data) + sum(delaySemanaRes.data);
-  const mes = sum(mesRes.data) + sum(delayMesRes.data);
+  const hoje = sum(hojeRes.data) + sum(delayHojeRes.data) + sum(erroHojeRes.data);
+  const semana = sum(semanaRes.data) + sum(delaySemanaRes.data) + sum(erroSemanaRes.data);
+  const mes = sum(mesRes.data) + sum(delayMesRes.data) + sum(erroMesRes.data);
   const metaSemanal = profileRes.data?.meta_semanal ?? null;
   const metaMensal = profileRes.data?.meta_mensal ?? null;
   const bancaInicial = profileRes.data?.banca_inicial ?? null;
@@ -138,27 +175,36 @@ export default async function DashboardPage({
 
       {isCurrentMonth && <BancaCard bancaInicial={bancaInicial} lucroMes={mes} mesLabel={mesLabel} />}
 
-      <DashboardTabs active={isDelay ? "delay" : "metodo"} />
+      <DashboardTabs active={aba} />
 
-      {isDelay ? (
+      {mercado ? (
         <>
           <Card>
-            <h2 className="mb-4 text-lg font-semibold text-neutral-100">Novo lançamento (Delay)</h2>
-            <DelayEntryForm />
+            <h2 className="mb-4 text-lg font-semibold text-neutral-100">
+              Novo lançamento ({MERCADOS[mercado].label})
+            </h2>
+            <MarketEntryForm mercado={mercado} />
           </Card>
 
           <Card>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-neutral-100">
-                Lançamentos de delay de {mesLabel}
+                Lançamentos de {MERCADOS[mercado].label.toLowerCase()} de {mesLabel}
               </h2>
               {!isCurrentMonth && (
-                <Link href="/dashboard?aba=delay" className="text-sm text-emerald-400 hover:underline">
+                <Link
+                  href={`/dashboard?aba=${mercado}`}
+                  className="text-sm text-emerald-400 hover:underline"
+                >
                   Ver mês atual
                 </Link>
               )}
             </div>
-            <DelayEntriesTable key={mesParam ?? "current"} entries={delayListRes.data ?? []} />
+            <MarketEntriesTable
+              key={`${mercado}-${mesParam ?? "current"}`}
+              mercado={mercado}
+              entries={(mercado === "delay" ? delayListRes.data : erroListRes.data) ?? []}
+            />
           </Card>
         </>
       ) : (
