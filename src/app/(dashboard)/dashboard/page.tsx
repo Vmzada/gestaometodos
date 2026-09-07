@@ -189,7 +189,7 @@ export default async function DashboardPage({
           <Card>
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-neutral-100">
-                Lançamentos de {MERCADOS[mercado].label.toLowerCase()} de {mesLabel}
+                Lançamentos {MERCADOS[mercado].lancamentosDe} de {mesLabel}
               </h2>
               {!isCurrentMonth && (
                 <Link

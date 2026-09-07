@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { Aba } from "@/lib/mercados";
+import { MERCADOS, type Aba } from "@/lib/mercados";
 
+// Método é a aba padrão; as demais saem de MERCADOS, para o nome do mercado
+// viver num lugar só.
 const ABAS: { aba: Aba; label: string; href: string }[] = [
   { aba: "metodo", label: "Método", href: "/dashboard" },
-  { aba: "delay", label: "Delay", href: "/dashboard?aba=delay" },
-  { aba: "erro", label: "Erro", href: "/dashboard?aba=erro" },
+  ...Object.entries(MERCADOS).map(([aba, { label }]) => ({
+    aba: aba as Aba,
+    label,
+    href: `/dashboard?aba=${aba}`,
+  })),
 ];
 
 export function DashboardTabs({ active }: { active: Aba }) {
   return (
-    <div className="inline-flex gap-1 rounded-lg border border-white/10 bg-neutral-900/60 p-1">
+    <div className="inline-flex flex-wrap gap-1 rounded-lg border border-white/10 bg-neutral-900/60 p-1">
       {ABAS.map(({ aba, label, href }) => (
         <Link
           key={aba}

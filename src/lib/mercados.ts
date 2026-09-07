@@ -6,9 +6,11 @@ export type Mercado = "delay" | "erro";
 /** Delay e erro têm colunas idênticas — o tipo serve para os dois. */
 export type MarketEntry = DelayEntry | ErroEntry;
 
-export const MERCADOS: Record<Mercado, { label: string }> = {
-  delay: { label: "Delay" },
-  erro: { label: "Erro" },
+export const MERCADOS: Record<Mercado, { label: string; lancamentosDe: string }> = {
+  delay: { label: "Delay", lancamentosDe: "de delay" },
+  // "Lançamentos de mercado de erro" ficaria com dois "de" seguidos, por isso o
+  // trecho da listagem vem escrito por extenso em vez de derivado do label.
+  erro: { label: "Mercado de Erro", lancamentosDe: "do mercado de erro" },
 };
 
 /** Abas do dashboard: o método mais um mercado esportivo por aba. */
