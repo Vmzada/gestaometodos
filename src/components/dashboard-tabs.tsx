@@ -5,7 +5,7 @@ import { MERCADOS, type Aba } from "@/lib/mercados";
 // Método é a aba padrão; as demais saem de MERCADOS, para o nome do mercado
 // viver num lugar só.
 const ABAS: { aba: Aba; label: string; href: string }[] = [
-  { aba: "metodo", label: "Método", href: "/dashboard" },
+  { aba: "metodo", label: "Métodos", href: "/dashboard" },
   ...Object.entries(MERCADOS).map(([aba, { label }]) => ({
     aba: aba as Aba,
     label,
