@@ -25,7 +25,7 @@ const FEATURES = [
 
 const PLAN_INCLUDES = [
   "Lucro com Método calculado automaticamente",
-  "Lucro com Delay calculado automaticamente",
+  "Lucro com Delay Esportivo calculado automaticamente",
   "Dashboard completo com totais em tempo real",
   "Calendário com o histórico de todos os dias",
   "Pagamento por Pix",
@@ -69,7 +69,7 @@ export default function Home() {
               <h1 className="text-glow mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-neutral-50 sm:text-5xl">
                 Gestão financeira para quem trabalha com{" "}
                 <span className="bg-gradient-to-r from-emerald-300 to-teal-400 bg-clip-text text-transparent">
-                  métodos e delay em casas de apostas
+                  métodos e delay esportivo em casas de apostas
                 </span>
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-lg text-neutral-400 lg:mx-0">

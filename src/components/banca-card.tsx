@@ -194,7 +194,7 @@ export function BancaCard({
           <div>
             <p className="text-sm text-neutral-400">Banca de {mesLabel}</p>
             <p className="mt-1 text-xs text-neutral-500">
-              Separe um valor só pra métodos e delay, sem misturar com outra renda.
+              Separe um valor só pra métodos e mercados esportivos, sem misturar com outra renda.
             </p>
           </div>
           <button

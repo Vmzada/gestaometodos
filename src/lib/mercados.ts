@@ -7,7 +7,7 @@ export type Mercado = "delay" | "erro";
 export type MarketEntry = DelayEntry | ErroEntry;
 
 export const MERCADOS: Record<Mercado, { label: string; lancamentosDe: string }> = {
-  delay: { label: "Delay", lancamentosDe: "de delay" },
+  delay: { label: "Delay Esportivo", lancamentosDe: "de delay esportivo" },
   // "Lançamentos de mercado de erro" ficaria com dois "de" seguidos, por isso o
   // trecho da listagem vem escrito por extenso em vez de derivado do label.
   erro: { label: "Mercado de Erro", lancamentosDe: "do mercado de erro" },
