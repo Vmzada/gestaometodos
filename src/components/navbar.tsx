@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
 const LINKS = [
-  { href: "/dashboard", label: "Lançamentos" },
+  { href: "/dashboard", label: "Início" },
   { href: "/dashboard/calendario", label: "Calendário" },
   { href: "/dashboard/gastos", label: "Gastos" },
   { href: "/dashboard/estatisticas", label: "Estatísticas" },
