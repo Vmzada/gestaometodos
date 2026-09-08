@@ -262,20 +262,20 @@ export function DutchingCalculator() {
 
       {/* Resumo */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-3 py-3 text-center">
+        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-2 py-3 text-center sm:px-3">
           <p className="text-xs font-medium tracking-wide text-neutral-500">LUCRO</p>
-          <p className={`mt-1 text-lg font-bold ${lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+          <p className={`mt-1 text-sm font-bold sm:text-lg ${lucro >= 0 ? "text-emerald-400" : "text-red-400"}`}>
             {formatBRL(lucro)}
           </p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-3 py-3 text-center">
+        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-2 py-3 text-center sm:px-3">
           <p className="text-xs font-medium tracking-wide text-neutral-500">RETORNO</p>
-          <p className="mt-1 text-lg font-bold text-neutral-100">{formatBRL(retorno)}</p>
+          <p className="mt-1 text-sm font-bold text-neutral-100 sm:text-lg">{formatBRL(retorno)}</p>
         </div>
-        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-3 py-3 text-center">
+        <div className="rounded-lg border border-white/10 bg-neutral-950/60 px-2 py-3 text-center sm:px-3">
           <p className="text-xs font-medium tracking-wide text-neutral-500">ROI</p>
           <p
-            className={`mt-1 text-lg font-bold ${roiPct >= 0 ? "text-emerald-400" : "text-red-400"}`}
+            className={`mt-1 text-sm font-bold sm:text-lg ${roiPct >= 0 ? "text-emerald-400" : "text-red-400"}`}
           >
             {roiPct >= 0 ? "+" : ""}
             {roiPct.toFixed(2)}%

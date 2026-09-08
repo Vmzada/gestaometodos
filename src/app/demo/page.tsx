@@ -71,10 +71,10 @@ export default async function DemoPage() {
   if (hasActiveSubscription(profile)) redirect("/dashboard");
 
   return (
-    <div className="bg-mesh relative min-h-screen bg-neutral-950">
+    <div className="bg-mesh relative flex min-h-screen flex-col bg-neutral-950 lg:flex-row">
       <div className="bg-grid pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
-      <div className="relative">
-        <Navbar />
+      <Navbar />
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <div className="border-b border-emerald-500/20 bg-emerald-500/10 px-6 py-2 text-center text-sm text-emerald-300">
           Isso é uma demonstração — os dados são de exemplo e os botões estão travados.{" "}
           <Link href="/assinatura" className="font-medium underline">
@@ -82,7 +82,7 @@ export default async function DemoPage() {
           </Link>
         </div>
 
-        <main className="mx-auto max-w-6xl space-y-8 px-6 py-8">
+        <main className="mx-auto w-full max-w-6xl space-y-8 px-6 py-8">
           <SummaryCards hoje={200.5} semana={266.25} mes={266.25} />
 
           <Card>

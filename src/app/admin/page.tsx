@@ -73,9 +73,9 @@ export default async function AdminPage() {
   ).length;
 
   return (
-    <div className="bg-mesh relative min-h-screen bg-neutral-950">
+    <div className="bg-mesh relative flex min-h-screen flex-col bg-neutral-950 lg:flex-row">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-6 py-8">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-neutral-100">Clientes</h1>

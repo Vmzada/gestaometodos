@@ -16,6 +16,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let trialEndsAt: string | null = null;
   let subscriptionDaysLeft: number | null = null;
   let firstName: string | null = null;
+  let fullName: string | null = null;
+  let isTrial = false;
 
   if (user) {
     const { data: profile } = await supabase
@@ -24,7 +26,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       .eq("id", user.id)
       .single();
 
-    firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? null;
+    fullName = profile?.full_name?.trim() || null;
+    firstName = fullName?.split(/\s+/)[0] ?? null;
+    isTrial = Boolean(profile && !hasActiveSubscription(profile) && isTrialActive(profile));
 
     if (profile && !hasActiveSubscription(profile) && isTrialActive(profile)) {
       trialEndsAt = getTrialEndsAt(profile)!.toISOString();
@@ -40,11 +44,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }
   }
 
+  // Empilhado no celular e no tablet (barra superior em cima do conteúdo); só
+  // vira linha a partir do lg, onde a sidebar aparece à esquerda.
   return (
-    <div className="bg-mesh relative flex min-h-screen bg-neutral-950">
+    <div className="bg-mesh relative flex min-h-screen flex-col bg-neutral-950 lg:flex-row">
       <div className="bg-grid pointer-events-none absolute inset-x-0 top-0 h-[480px]" />
       {user && <WelcomeGreeting userId={user.id} firstName={firstName} />}
-      <Navbar subscriptionDaysLeft={subscriptionDaysLeft} />
+      <Navbar
+        subscriptionDaysLeft={subscriptionDaysLeft}
+        userName={fullName}
+        userEmail={user?.email ?? null}
+        isTrial={isTrial}
+      />
       <div className="relative flex min-w-0 flex-1 flex-col">
         {trialEndsAt && <TrialCountdownBanner endsAt={trialEndsAt} />}
         {!trialEndsAt && expiryBanner && (
