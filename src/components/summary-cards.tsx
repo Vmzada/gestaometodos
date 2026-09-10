@@ -12,7 +12,8 @@ function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }
     <button
       type="button"
       onClick={onClick}
-      aria-label={hidden ? "Mostrar valor" : "Ocultar valor"}
+      aria-label={hidden ? "Mostrar detalhes" : "Ocultar detalhes"}
+      title={hidden ? "Mostrar detalhes" : "Ocultar detalhes"}
       className="text-neutral-500 transition-colors hover:text-neutral-300"
     >
       {hidden ? (
@@ -170,16 +171,12 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Hoje</p>
                 <EyeToggle hidden={!!hidden.hoje} onClick={() => toggle("hoje")} />
               </div>
-              {!hidden.hoje && (
-                <>
-                  <p
-                    className={`mt-1 text-2xl font-semibold ${valorHoje >= 0 ? "text-emerald-400" : "text-red-400"}`}
-                  >
-                    {formatBRL(valorHoje)}
-                  </p>
-                  <Detalhe ganhos={ganhosHoje} reds={redsHoje} gastos={gastosHoje} />
-                </>
-              )}
+              <p
+                className={`mt-1 text-2xl font-semibold ${valorHoje >= 0 ? "text-emerald-400" : "text-red-400"}`}
+              >
+                {formatBRL(valorHoje)}
+              </p>
+              {!hidden.hoje && <Detalhe ganhos={ganhosHoje} reds={redsHoje} gastos={gastosHoje} />}
             </div>
             <span className="text-2xl opacity-70">☀️</span>
           </div>
@@ -194,28 +191,22 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Esta semana</p>
                 <EyeToggle hidden={!!hidden.semana} onClick={() => toggle("semana")} />
               </div>
-              {!hidden.semana && (
-                <>
-                  <p
-                    className={`mt-1 text-2xl font-semibold ${valorSemana >= 0 ? "text-emerald-400" : "text-red-400"}`}
-                  >
-                    {formatBRL(valorSemana)}
-                  </p>
-                  <Detalhe ganhos={ganhosSemana} reds={redsSemana} gastos={gastosSemana} />
-                </>
-              )}
+              <p
+                className={`mt-1 text-2xl font-semibold ${valorSemana >= 0 ? "text-emerald-400" : "text-red-400"}`}
+              >
+                {formatBRL(valorSemana)}
+              </p>
+              {!hidden.semana && <Detalhe ganhos={ganhosSemana} reds={redsSemana} gastos={gastosSemana} />}
             </div>
             <span className="text-2xl opacity-70">📅</span>
           </div>
-          {!hidden.semana && (
-            <GoalProgress
-              current={valorSemana}
-              goal={metaSemanal}
-              fieldName="meta_semanal"
-              otherFieldName="meta_mensal"
-              otherValue={metaMensal}
-            />
-          )}
+          <GoalProgress
+            current={valorSemana}
+            goal={metaSemanal}
+            fieldName="meta_semanal"
+            otherFieldName="meta_mensal"
+            otherValue={metaMensal}
+          />
         </Card>
       </TiltCard>
 
@@ -227,16 +218,12 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
                 <EyeToggle hidden={!!hidden.mes} onClick={() => toggle("mes")} />
               </div>
-              {!hidden.mes && (
-                <>
-                  <p
-                    className={`mt-1 text-2xl font-semibold ${valorMes >= 0 ? "text-emerald-400" : "text-red-400"}`}
-                  >
-                    {formatBRL(valorMes)}
-                  </p>
-                  <Detalhe ganhos={ganhosMes} reds={redsMes} gastos={gastosMes} />
-                </>
-              )}
+              <p
+                className={`mt-1 text-2xl font-semibold ${valorMes >= 0 ? "text-emerald-400" : "text-red-400"}`}
+              >
+                {formatBRL(valorMes)}
+              </p>
+              {!hidden.mes && <Detalhe ganhos={ganhosMes} reds={redsMes} gastos={gastosMes} />}
             </div>
             {mesPrevHref && mesNextHref ? (
               <div className="flex flex-col items-end gap-1.5">
@@ -266,7 +253,7 @@ export function SummaryCards({
               <span className="text-2xl opacity-70">📈</span>
             )}
           </div>
-          {mesIsCurrent && !hidden.mes && (
+          {mesIsCurrent && (
             <GoalProgress
               current={valorMes}
               goal={metaMensal}
