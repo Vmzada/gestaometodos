@@ -35,6 +35,16 @@ export function todayISO() {
   return toISODate(nowInBrazil());
 }
 
+/**
+ * Noite pelo horário de Brasília: das 18h às 5h59. Calculado no servidor e
+ * passado por prop — se fosse lido no navegador durante o render, o HTML do
+ * servidor e o do cliente poderiam divergir no fuso e quebrar a hidratação.
+ */
+export function isNoiteInBrazil(now = nowInBrazil()) {
+  const hora = now.getUTCHours();
+  return hora >= 18 || hora < 6;
+}
+
 /** Monday–Sunday range containing `date` (UTC semantics), as ISO date strings. */
 export function getWeekRange(date: Date) {
   const day = date.getUTCDay();

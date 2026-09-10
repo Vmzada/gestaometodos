@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasActiveSubscription } from "@/lib/subscription";
 import { Navbar } from "@/components/navbar";
 import { SummaryCards } from "@/components/summary-cards";
+import { isNoiteInBrazil } from "@/lib/date-helpers";
 import { EntryForm } from "@/components/entry-form";
 import { EntriesTable } from "@/components/entries-table";
 import { Card } from "@/components/ui/card";
@@ -83,7 +84,7 @@ export default async function DemoPage() {
         </div>
 
         <main className="mx-auto w-full max-w-6xl space-y-8 px-6 py-8">
-          <SummaryCards hoje={200.5} semana={266.25} mes={266.25} />
+          <SummaryCards hoje={200.5} semana={266.25} mes={266.25} isNoite={isNoiteInBrazil()} />
 
           <Card>
             <h2 className="mb-4 text-lg font-semibold text-neutral-100">Novo lançamento</h2>

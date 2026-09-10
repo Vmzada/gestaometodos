@@ -98,6 +98,7 @@ export function SummaryCards({
   redsSemana = 0,
   ganhosMes = 0,
   redsMes = 0,
+  isNoite = false,
 }: {
   hoje: number;
   semana: number;
@@ -119,6 +120,8 @@ export function SummaryCards({
   redsSemana?: number;
   ganhosMes?: number;
   redsMes?: number;
+  /** Das 18h às 5h59 no horário de Brasília o card de hoje mostra lua. */
+  isNoite?: boolean;
 }) {
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setHidden((h) => ({ ...h, [key]: !h[key] }));
@@ -178,7 +181,7 @@ export function SummaryCards({
               </p>
               {!hidden.hoje && <Detalhe ganhos={ganhosHoje} reds={redsHoje} gastos={gastosHoje} />}
             </div>
-            <span className="text-2xl opacity-70">☀️</span>
+            <span className="text-2xl opacity-70">{isNoite ? "🌙" : "☀️"}</span>
           </div>
         </Card>
       </TiltCard>

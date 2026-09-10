@@ -8,7 +8,14 @@ import { MERCADOS, parseAba } from "@/lib/mercados";
 import { SummaryCards } from "@/components/summary-cards";
 import { BancaCard } from "@/components/banca-card";
 import { Card } from "@/components/ui/card";
-import { getMonthRange, getWeekRange, MESES_PT, nowInBrazil, todayISO } from "@/lib/date-helpers";
+import {
+  getMonthRange,
+  getWeekRange,
+  isNoiteInBrazil,
+  MESES_PT,
+  nowInBrazil,
+  todayISO,
+} from "@/lib/date-helpers";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -225,6 +232,7 @@ export default async function DashboardPage({
         redsSemana={partesSemana.reds}
         ganhosMes={partesMes.ganhos}
         redsMes={partesMes.reds}
+        isNoite={isNoiteInBrazil(now)}
       />
 
       {isCurrentMonth && <BancaCard bancaInicial={bancaInicial} lucroMes={mes} mesLabel={mesLabel} />}
