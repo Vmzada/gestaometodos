@@ -39,23 +39,22 @@ function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }
 }
 
 /**
- * Mostra de onde veio o número: ganhos, reds e (quando o alternador está em
- * "com gastos") os gastos. Reds já estão embutidos no total — aparecem aqui
- * só para ficar visível quanto foi prejuízo, nunca são descontados de novo.
+ * Mostra de onde veio o número: ganhos, reds e gastos do período. Os três
+ * aparecem sempre que existirem — o alternador decide só se os gastos saem do
+ * número grande, não se aparecem aqui. Reds já estão embutidos no total (o
+ * lucro de um red é gravado negativo), então nunca são descontados de novo.
  */
 function Detalhe({
   ganhos,
   reds,
   gastos,
-  mostrarGastos,
 }: {
   ganhos: number;
   reds: number;
   gastos: number;
-  mostrarGastos: boolean;
 }) {
   const temReds = reds < 0;
-  const temGastos = mostrarGastos && gastos > 0;
+  const temGastos = gastos > 0;
   if (!temReds && !temGastos) return null;
 
   return (
@@ -171,19 +170,16 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Hoje</p>
                 <EyeToggle hidden={!!hidden.hoje} onClick={() => toggle("hoje")} />
               </div>
-              <p
-                className={`mt-1 text-2xl font-semibold ${valorHoje >= 0 ? "text-emerald-400" : "text-red-400"} ${
-                  hidden.hoje ? "select-none blur-sm" : ""
-                }`}
-              >
-                {formatBRL(valorHoje)}
-              </p>
-              <Detalhe
-                ganhos={ganhosHoje}
-                reds={redsHoje}
-                gastos={gastosHoje}
-                mostrarGastos={comGastos}
-              />
+              {!hidden.hoje && (
+                <>
+                  <p
+                    className={`mt-1 text-2xl font-semibold ${valorHoje >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                  >
+                    {formatBRL(valorHoje)}
+                  </p>
+                  <Detalhe ganhos={ganhosHoje} reds={redsHoje} gastos={gastosHoje} />
+                </>
+              )}
             </div>
             <span className="text-2xl opacity-70">☀️</span>
           </div>
@@ -198,29 +194,28 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Esta semana</p>
                 <EyeToggle hidden={!!hidden.semana} onClick={() => toggle("semana")} />
               </div>
-              <p
-                className={`mt-1 text-2xl font-semibold ${valorSemana >= 0 ? "text-emerald-400" : "text-red-400"} ${
-                  hidden.semana ? "select-none blur-sm" : ""
-                }`}
-              >
-                {formatBRL(valorSemana)}
-              </p>
-              <Detalhe
-                ganhos={ganhosSemana}
-                reds={redsSemana}
-                gastos={gastosSemana}
-                mostrarGastos={comGastos}
-              />
+              {!hidden.semana && (
+                <>
+                  <p
+                    className={`mt-1 text-2xl font-semibold ${valorSemana >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                  >
+                    {formatBRL(valorSemana)}
+                  </p>
+                  <Detalhe ganhos={ganhosSemana} reds={redsSemana} gastos={gastosSemana} />
+                </>
+              )}
             </div>
             <span className="text-2xl opacity-70">📅</span>
           </div>
-          <GoalProgress
-            current={valorSemana}
-            goal={metaSemanal}
-            fieldName="meta_semanal"
-            otherFieldName="meta_mensal"
-            otherValue={metaMensal}
-          />
+          {!hidden.semana && (
+            <GoalProgress
+              current={valorSemana}
+              goal={metaSemanal}
+              fieldName="meta_semanal"
+              otherFieldName="meta_mensal"
+              otherValue={metaMensal}
+            />
+          )}
         </Card>
       </TiltCard>
 
@@ -232,19 +227,16 @@ export function SummaryCards({
                 <p className="text-sm text-neutral-400">Este mês{mesLabel ? ` (${mesLabel})` : ""}</p>
                 <EyeToggle hidden={!!hidden.mes} onClick={() => toggle("mes")} />
               </div>
-              <p
-                className={`mt-1 text-2xl font-semibold ${valorMes >= 0 ? "text-emerald-400" : "text-red-400"} ${
-                  hidden.mes ? "select-none blur-sm" : ""
-                }`}
-              >
-                {formatBRL(valorMes)}
-              </p>
-              <Detalhe
-                ganhos={ganhosMes}
-                reds={redsMes}
-                gastos={gastosMes}
-                mostrarGastos={comGastos}
-              />
+              {!hidden.mes && (
+                <>
+                  <p
+                    className={`mt-1 text-2xl font-semibold ${valorMes >= 0 ? "text-emerald-400" : "text-red-400"}`}
+                  >
+                    {formatBRL(valorMes)}
+                  </p>
+                  <Detalhe ganhos={ganhosMes} reds={redsMes} gastos={gastosMes} />
+                </>
+              )}
             </div>
             {mesPrevHref && mesNextHref ? (
               <div className="flex flex-col items-end gap-1.5">
@@ -274,7 +266,7 @@ export function SummaryCards({
               <span className="text-2xl opacity-70">📈</span>
             )}
           </div>
-          {mesIsCurrent && (
+          {mesIsCurrent && !hidden.mes && (
             <GoalProgress
               current={valorMes}
               goal={metaMensal}
