@@ -17,6 +17,10 @@ function sum(rows: { lucro: number }[] | null) {
   return (rows ?? []).reduce((total, row) => total + Number(row.lucro), 0);
 }
 
+function sumGastos(rows: { valor: number }[] | null) {
+  return (rows ?? []).reduce((total, row) => total + Number(row.valor), 0);
+}
+
 function monthParam(date: Date) {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
 }
@@ -94,6 +98,9 @@ export default async function DashboardPage({
     erroHojeRes,
     erroSemanaRes,
     erroMesRes,
+    gastosHojeRes,
+    gastosSemanaRes,
+    gastosMesRes,
     listRes,
     delayListRes,
     erroListRes,
@@ -146,6 +153,19 @@ export default async function DashboardPage({
       .eq("user_id", user!.id)
       .gte("entry_date", month.start)
       .lte("entry_date", month.end),
+    supabase.from("gastos").select("valor").eq("user_id", user!.id).eq("gasto_date", today),
+    supabase
+      .from("gastos")
+      .select("valor")
+      .eq("user_id", user!.id)
+      .gte("gasto_date", week.start)
+      .lte("gasto_date", week.end),
+    supabase
+      .from("gastos")
+      .select("valor")
+      .eq("user_id", user!.id)
+      .gte("gasto_date", month.start)
+      .lte("gasto_date", month.end),
     mercado ? empty : listQuery,
     mercado === "delay" ? delayListQuery : empty,
     mercado === "erro" ? erroListQuery : empty,
@@ -155,6 +175,9 @@ export default async function DashboardPage({
   const hoje = sum(hojeRes.data) + sum(delayHojeRes.data) + sum(erroHojeRes.data);
   const semana = sum(semanaRes.data) + sum(delaySemanaRes.data) + sum(erroSemanaRes.data);
   const mes = sum(mesRes.data) + sum(delayMesRes.data) + sum(erroMesRes.data);
+  const gastosHoje = sumGastos(gastosHojeRes.data);
+  const gastosSemana = sumGastos(gastosSemanaRes.data);
+  const gastosMes = sumGastos(gastosMesRes.data);
   const metaSemanal = profileRes.data?.meta_semanal ?? null;
   const metaMensal = profileRes.data?.meta_mensal ?? null;
   const bancaInicial = profileRes.data?.banca_inicial ?? null;
@@ -171,6 +194,9 @@ export default async function DashboardPage({
         mesIsCurrent={isCurrentMonth}
         metaSemanal={metaSemanal}
         metaMensal={metaMensal}
+        gastosHoje={gastosHoje}
+        gastosSemana={gastosSemana}
+        gastosMes={gastosMes}
       />
 
       {isCurrentMonth && <BancaCard bancaInicial={bancaInicial} lucroMes={mes} mesLabel={mesLabel} />}
