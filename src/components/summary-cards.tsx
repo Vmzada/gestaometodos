@@ -7,6 +7,8 @@ import { TiltCard } from "@/components/ui/tilt-card";
 import { GoalProgress } from "@/components/goal-progress";
 import { formatBRL } from "@/lib/date-helpers";
 
+const DETALHES_ESCONDIDOS = { hoje: true, semana: true, mes: true };
+
 function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }) {
   return (
     <button
@@ -123,7 +125,10 @@ export function SummaryCards({
   /** Das 18h às 5h59 no horário de Brasília o card de hoje mostra lua. */
   isNoite?: boolean;
 }) {
-  const [hidden, setHidden] = useState<Record<string, boolean>>({});
+  // O detalhamento nasce escondido em todos os cards, toda vez que a página
+  // abre: quem quiser ver Ganhos/Reds/Gastos clica no olho do card. Como é uma
+  // constante, servidor e cliente renderizam igual e a hidratação não quebra.
+  const [hidden, setHidden] = useState<Record<string, boolean>>(DETALHES_ESCONDIDOS);
   const toggle = (key: string) => setHidden((h) => ({ ...h, [key]: !h[key] }));
 
   // Os lançamentos (métodos + delay esportivo + erro) somam o lucro bruto; os
