@@ -21,6 +21,25 @@ function sumGastos(rows: { valor: number }[] | null) {
   return (rows ?? []).reduce((total, row) => total + Number(row.valor), 0);
 }
 
+/**
+ * Separa os lançamentos em ganhos e reds. Um red ja e gravado com lucro
+ * negativo (ver parseMarketEntryFields), entao ele ja esta dentro da soma do
+ * mes — isto aqui so torna visivel quanto dele veio de prejuizo, sem
+ * descontar de novo.
+ */
+function splitGanhosReds(...listas: ({ lucro: number }[] | null)[]) {
+  let ganhos = 0;
+  let reds = 0;
+  for (const rows of listas) {
+    for (const row of rows ?? []) {
+      const v = Number(row.lucro);
+      if (v >= 0) ganhos += v;
+      else reds += v;
+    }
+  }
+  return { ganhos, reds };
+}
+
 function monthParam(date: Date) {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
 }
@@ -175,6 +194,9 @@ export default async function DashboardPage({
   const hoje = sum(hojeRes.data) + sum(delayHojeRes.data) + sum(erroHojeRes.data);
   const semana = sum(semanaRes.data) + sum(delaySemanaRes.data) + sum(erroSemanaRes.data);
   const mes = sum(mesRes.data) + sum(delayMesRes.data) + sum(erroMesRes.data);
+  const partesHoje = splitGanhosReds(hojeRes.data, delayHojeRes.data, erroHojeRes.data);
+  const partesSemana = splitGanhosReds(semanaRes.data, delaySemanaRes.data, erroSemanaRes.data);
+  const partesMes = splitGanhosReds(mesRes.data, delayMesRes.data, erroMesRes.data);
   const gastosHoje = sumGastos(gastosHojeRes.data);
   const gastosSemana = sumGastos(gastosSemanaRes.data);
   const gastosMes = sumGastos(gastosMesRes.data);
@@ -197,6 +219,12 @@ export default async function DashboardPage({
         gastosHoje={gastosHoje}
         gastosSemana={gastosSemana}
         gastosMes={gastosMes}
+        ganhosHoje={partesHoje.ganhos}
+        redsHoje={partesHoje.reds}
+        ganhosSemana={partesSemana.ganhos}
+        redsSemana={partesSemana.reds}
+        ganhosMes={partesMes.ganhos}
+        redsMes={partesMes.reds}
       />
 
       {isCurrentMonth && <BancaCard bancaInicial={bancaInicial} lucroMes={mes} mesLabel={mesLabel} />}

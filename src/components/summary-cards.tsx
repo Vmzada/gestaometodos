@@ -38,6 +38,47 @@ function EyeToggle({ hidden, onClick }: { hidden: boolean; onClick: () => void }
   );
 }
 
+/**
+ * Mostra de onde veio o número: ganhos, reds e (quando o alternador está em
+ * "com gastos") os gastos. Reds já estão embutidos no total — aparecem aqui
+ * só para ficar visível quanto foi prejuízo, nunca são descontados de novo.
+ */
+function Detalhe({
+  ganhos,
+  reds,
+  gastos,
+  mostrarGastos,
+}: {
+  ganhos: number;
+  reds: number;
+  gastos: number;
+  mostrarGastos: boolean;
+}) {
+  const temReds = reds < 0;
+  const temGastos = mostrarGastos && gastos > 0;
+  if (!temReds && !temGastos) return null;
+
+  return (
+    <div className="mt-1.5 space-y-0.5 text-xs">
+      {temReds && (
+        <>
+          <p className="text-neutral-500">
+            Ganhos <span className="text-neutral-300">{formatBRL(ganhos)}</span>
+          </p>
+          <p className="text-neutral-500">
+            Reds <span className="text-red-400">{formatBRL(reds)}</span>
+          </p>
+        </>
+      )}
+      {temGastos && (
+        <p className="text-neutral-500">
+          Gastos <span className="text-red-400">−{formatBRL(gastos)}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function SummaryCards({
   hoje,
   semana,
@@ -51,6 +92,12 @@ export function SummaryCards({
   gastosHoje = 0,
   gastosSemana = 0,
   gastosMes = 0,
+  ganhosHoje = 0,
+  redsHoje = 0,
+  ganhosSemana = 0,
+  redsSemana = 0,
+  ganhosMes = 0,
+  redsMes = 0,
 }: {
   hoje: number;
   semana: number;
@@ -64,6 +111,14 @@ export function SummaryCards({
   gastosHoje?: number;
   gastosSemana?: number;
   gastosMes?: number;
+  /** Soma só dos lançamentos positivos do período. */
+  ganhosHoje?: number;
+  /** Soma dos reds — já vem negativa e já está dentro do total. */
+  redsHoje?: number;
+  ganhosSemana?: number;
+  redsSemana?: number;
+  ganhosMes?: number;
+  redsMes?: number;
 }) {
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setHidden((h) => ({ ...h, [key]: !h[key] }));
@@ -123,9 +178,12 @@ export function SummaryCards({
               >
                 {formatBRL(valorHoje)}
               </p>
-              {comGastos && gastosHoje > 0 && (
-                <p className="text-xs text-red-400">− {formatBRL(gastosHoje)} em gastos</p>
-              )}
+              <Detalhe
+                ganhos={ganhosHoje}
+                reds={redsHoje}
+                gastos={gastosHoje}
+                mostrarGastos={comGastos}
+              />
             </div>
             <span className="text-2xl opacity-70">☀️</span>
           </div>
@@ -147,9 +205,12 @@ export function SummaryCards({
               >
                 {formatBRL(valorSemana)}
               </p>
-              {comGastos && gastosSemana > 0 && (
-                <p className="text-xs text-red-400">− {formatBRL(gastosSemana)} em gastos</p>
-              )}
+              <Detalhe
+                ganhos={ganhosSemana}
+                reds={redsSemana}
+                gastos={gastosSemana}
+                mostrarGastos={comGastos}
+              />
             </div>
             <span className="text-2xl opacity-70">📅</span>
           </div>
@@ -178,9 +239,12 @@ export function SummaryCards({
               >
                 {formatBRL(valorMes)}
               </p>
-              {comGastos && gastosMes > 0 && (
-                <p className="text-xs text-red-400">− {formatBRL(gastosMes)} em gastos</p>
-              )}
+              <Detalhe
+                ganhos={ganhosMes}
+                reds={redsMes}
+                gastos={gastosMes}
+                mostrarGastos={comGastos}
+              />
             </div>
             {mesPrevHref && mesNextHref ? (
               <div className="flex flex-col items-end gap-1.5">
