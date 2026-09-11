@@ -34,7 +34,7 @@ export default async function EstatisticasPage() {
   const rangeStart = `${buckets[0].year}-${String(buckets[0].month + 1).padStart(2, "0")}-01`;
   const rangeEnd = toISODate(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)));
 
-  const [entriesRes, delayRes, erroRes, gastosRes] = await Promise.all([
+  const [entriesRes, delayRes, erroRes, rodadasRes, gastosRes] = await Promise.all([
     supabase
       .from("entries")
       .select("entry_date, deposito, cliente_parte, cpa, lucro")
@@ -49,6 +49,12 @@ export default async function EstatisticasPage() {
       .lte("entry_date", rangeEnd),
     supabase
       .from("erro_entries")
+      .select("entry_date, cliente_parte, lucro")
+      .eq("user_id", user!.id)
+      .gte("entry_date", rangeStart)
+      .lte("entry_date", rangeEnd),
+    supabase
+      .from("rodadas_entries")
       .select("entry_date, cliente_parte, lucro")
       .eq("user_id", user!.id)
       .gte("entry_date", rangeStart)
@@ -74,8 +80,13 @@ export default async function EstatisticasPage() {
     bucket.cpa += Number(row.cpa);
     bucket.lucro += Number(row.lucro);
   }
-  // Delay e erro não têm depósito nem CPA — só entram na parte do cliente e no lucro.
-  for (const row of [...(delayRes.data ?? []), ...(erroRes.data ?? [])]) {
+  // Delay, erro e rodadas grátis não têm depósito nem CPA — só entram na parte
+  // do cliente e no lucro.
+  for (const row of [
+    ...(delayRes.data ?? []),
+    ...(erroRes.data ?? []),
+    ...(rodadasRes.data ?? []),
+  ]) {
     const bucket = byMonth.get(row.entry_date.slice(0, 7));
     if (!bucket) continue;
     bucket.clienteParte += Number(row.cliente_parte);
@@ -133,7 +144,7 @@ export default async function EstatisticasPage() {
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-neutral-300">
               <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-              Métodos + Delay Esportivo + Mercado de Erro
+              Métodos + Rodadas + Delay + Erro
             </span>
           </div>
         </div>

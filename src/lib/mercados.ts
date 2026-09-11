@@ -1,6 +1,9 @@
 import type { DelayEntry, ErroEntry } from "@/lib/database.types";
 
-/** Mercados esportivos: mesma estrutura de lançamento, tabelas separadas. */
+/**
+ * Mercados esportivos: giram em torno de odd, valor e green/red, e por isso
+ * dividem o mesmo formulário e a mesma tabela de listagem.
+ */
 export type Mercado = "delay" | "erro";
 
 /** Delay e erro têm colunas idênticas — o tipo serve para os dois. */
@@ -13,10 +16,30 @@ export const MERCADOS: Record<Mercado, { label: string; lancamentosDe: string }>
   erro: { label: "Mercado de Erro", lancamentosDe: "do mercado de erro" },
 };
 
-/** Abas do dashboard: o método mais um mercado esportivo por aba. */
-export type Aba = "metodo" | Mercado;
+export function isMercado(value: string | undefined): value is Mercado {
+  return value === "delay" || value === "erro";
+}
+
+/**
+ * Abas do dashboard. Métodos e rodadas grátis têm campos próprios e ficam de
+ * fora de MERCADOS; só delay e erro compartilham a estrutura de odd.
+ */
+export type Aba = "metodo" | "rodadas" | Mercado;
+
+export const ABAS: { aba: Aba; label: string; lancamentosDe: string }[] = [
+  { aba: "metodo", label: "Métodos", lancamentosDe: "" },
+  { aba: "rodadas", label: "Rodadas Grátis", lancamentosDe: "de rodadas grátis" },
+  { aba: "delay", label: MERCADOS.delay.label, lancamentosDe: MERCADOS.delay.lancamentosDe },
+  { aba: "erro", label: MERCADOS.erro.label, lancamentosDe: MERCADOS.erro.lancamentosDe },
+];
+
+export const RODADAS_LABEL = "Rodadas Grátis";
 
 export function parseAba(value: string | undefined): Aba {
-  if (value === "delay" || value === "erro") return value;
+  if (value === "delay" || value === "erro" || value === "rodadas") return value;
   return "metodo";
+}
+
+export function abaHref(aba: Aba) {
+  return aba === "metodo" ? "/dashboard" : `/dashboard?aba=${aba}`;
 }

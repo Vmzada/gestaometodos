@@ -74,6 +74,41 @@ function parseMarketEntryFields(formData: FormData) {
   };
 }
 
+function parseRodadaFields(formData: FormData) {
+  const entry_date = String(formData.get("entry_date") ?? "");
+  const casa_aposta = String(formData.get("casa_aposta") ?? "").trim();
+  const quantidadeRaw = formData.get("quantidade");
+  const quantidade = quantidadeRaw ? Number(quantidadeRaw) : 0;
+  const valor_ganho = Number(formData.get("valor_ganho"));
+  const cliente_nome = String(formData.get("cliente_nome") ?? "").trim();
+  const cliente_parte_raw = formData.get("cliente_parte");
+  const cliente_parte = cliente_parte_raw ? Number(cliente_parte_raw) : 0;
+
+  if (
+    !entry_date ||
+    !casa_aposta ||
+    Number.isNaN(quantidade) ||
+    Number.isNaN(valor_ganho) ||
+    Number.isNaN(cliente_parte)
+  ) {
+    return null;
+  }
+
+  // Rodada gratis nao custa nada pra girar: o lucro e o que rendeu menos a
+  // parte do cliente.
+  const lucro = valor_ganho - cliente_parte;
+
+  return {
+    entry_date,
+    casa_aposta,
+    quantidade,
+    valor_ganho,
+    cliente_nome: cliente_nome || null,
+    cliente_parte,
+    lucro,
+  };
+}
+
 function revalidateDashboard() {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/calendario");
@@ -191,6 +226,40 @@ export async function updateErroEntry(id: string, formData: FormData) {
 export async function deleteErroEntry(id: string) {
   const { supabase } = await requireUser();
   const { error } = await supabase.from("erro_entries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function createRodadaEntry(
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const { supabase, user } = await requireUser();
+  const fields = parseRodadaFields(formData);
+  if (!fields) return { error: "Preencha todos os campos corretamente." };
+
+  const { error } = await supabase.from("rodadas_entries").insert({ user_id: user.id, ...fields });
+  if (error) return { error: error.message };
+
+  revalidateDashboard();
+  return { error: null };
+}
+
+export async function updateRodadaEntry(id: string, formData: FormData) {
+  const { supabase } = await requireUser();
+  const fields = parseRodadaFields(formData);
+  if (!fields) throw new Error("Preencha todos os campos corretamente.");
+
+  const { error } = await supabase.from("rodadas_entries").update(fields).eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidateDashboard();
+}
+
+export async function deleteRodadaEntry(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("rodadas_entries").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
   revalidateDashboard();

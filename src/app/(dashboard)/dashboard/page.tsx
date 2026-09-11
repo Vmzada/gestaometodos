@@ -4,7 +4,9 @@ import { EntriesTable } from "@/components/entries-table";
 import { MarketEntryForm } from "@/components/market-entry-form";
 import { MarketEntriesTable } from "@/components/market-entries-table";
 import { DashboardTabs } from "@/components/dashboard-tabs";
-import { MERCADOS, parseAba } from "@/lib/mercados";
+import { isMercado, MERCADOS, parseAba, RODADAS_LABEL } from "@/lib/mercados";
+import { RodadaEntryForm } from "@/components/rodada-entry-form";
+import { RodadasEntriesTable } from "@/components/rodadas-entries-table";
 import { SummaryCards } from "@/components/summary-cards";
 import { BancaCard } from "@/components/banca-card";
 import { Card } from "@/components/ui/card";
@@ -58,8 +60,10 @@ export default async function DashboardPage({
 }) {
   const { data: selectedDate, aba: abaParam, mes: mesParam } = await searchParams;
   const aba = parseAba(abaParam);
-  // Método é a aba padrão; as outras são mercados esportivos (delay, erro).
-  const mercado = aba === "metodo" ? null : aba;
+  // Só delay e erro compartilham o formulário de odd; métodos e rodadas
+  // grátis têm os seus próprios.
+  const mercado = isMercado(aba) ? aba : null;
+  const isRodadas = aba === "rodadas";
   const supabase = await createClient();
   const {
     data: { user },
@@ -79,7 +83,7 @@ export default async function DashboardPage({
   const isCurrentMonth =
     selYear === now.getUTCFullYear() && selMonth - 1 === now.getUTCMonth();
   const mesLabel = `${MESES_PT[selMonth - 1]} de ${selYear}`;
-  const abaQuery = mercado ? `&aba=${mercado}` : "";
+  const abaQuery = aba === "metodo" ? "" : `&aba=${aba}`;
   const mesPrevHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth - 2, 1)))}${abaQuery}`;
   const mesNextHref = `/dashboard?mes=${monthParam(new Date(Date.UTC(selYear, selMonth, 1)))}${abaQuery}`;
 
@@ -112,6 +116,15 @@ export default async function DashboardPage({
     .order("entry_date", { ascending: false })
     .order("created_at", { ascending: false });
 
+  const rodadasListQuery = supabase
+    .from("rodadas_entries")
+    .select("*")
+    .eq("user_id", user!.id)
+    .gte("entry_date", month.start)
+    .lte("entry_date", month.end)
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
   const empty = Promise.resolve({ data: [] });
 
   const [
@@ -127,7 +140,11 @@ export default async function DashboardPage({
     gastosHojeRes,
     gastosSemanaRes,
     gastosMesRes,
+    rodadasHojeRes,
+    rodadasSemanaRes,
+    rodadasMesRes,
     listRes,
+    rodadasListRes,
     delayListRes,
     erroListRes,
     profileRes,
@@ -192,18 +209,57 @@ export default async function DashboardPage({
       .eq("user_id", user!.id)
       .gte("gasto_date", month.start)
       .lte("gasto_date", month.end),
-    mercado ? empty : listQuery,
+    supabase
+      .from("rodadas_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .eq("entry_date", today),
+    supabase
+      .from("rodadas_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .gte("entry_date", week.start)
+      .lte("entry_date", week.end),
+    supabase
+      .from("rodadas_entries")
+      .select("lucro")
+      .eq("user_id", user!.id)
+      .gte("entry_date", month.start)
+      .lte("entry_date", month.end),
+    aba === "metodo" ? listQuery : empty,
+    isRodadas ? rodadasListQuery : empty,
     mercado === "delay" ? delayListQuery : empty,
     mercado === "erro" ? erroListQuery : empty,
     supabase.from("profiles").select("meta_semanal, meta_mensal, banca_inicial").eq("id", user!.id).single(),
   ]);
 
-  const hoje = sum(hojeRes.data) + sum(delayHojeRes.data) + sum(erroHojeRes.data);
-  const semana = sum(semanaRes.data) + sum(delaySemanaRes.data) + sum(erroSemanaRes.data);
-  const mes = sum(mesRes.data) + sum(delayMesRes.data) + sum(erroMesRes.data);
-  const partesHoje = splitGanhosReds(hojeRes.data, delayHojeRes.data, erroHojeRes.data);
-  const partesSemana = splitGanhosReds(semanaRes.data, delaySemanaRes.data, erroSemanaRes.data);
-  const partesMes = splitGanhosReds(mesRes.data, delayMesRes.data, erroMesRes.data);
+  const hoje =
+    sum(hojeRes.data) + sum(delayHojeRes.data) + sum(erroHojeRes.data) + sum(rodadasHojeRes.data);
+  const semana =
+    sum(semanaRes.data) +
+    sum(delaySemanaRes.data) +
+    sum(erroSemanaRes.data) +
+    sum(rodadasSemanaRes.data);
+  const mes =
+    sum(mesRes.data) + sum(delayMesRes.data) + sum(erroMesRes.data) + sum(rodadasMesRes.data);
+  const partesHoje = splitGanhosReds(
+    hojeRes.data,
+    delayHojeRes.data,
+    erroHojeRes.data,
+    rodadasHojeRes.data,
+  );
+  const partesSemana = splitGanhosReds(
+    semanaRes.data,
+    delaySemanaRes.data,
+    erroSemanaRes.data,
+    rodadasSemanaRes.data,
+  );
+  const partesMes = splitGanhosReds(
+    mesRes.data,
+    delayMesRes.data,
+    erroMesRes.data,
+    rodadasMesRes.data,
+  );
   const gastosHoje = sumGastos(gastosHojeRes.data);
   const gastosSemana = sumGastos(gastosSemanaRes.data);
   const gastosMes = sumGastos(gastosMesRes.data);
@@ -266,6 +322,32 @@ export default async function DashboardPage({
               key={`${mercado}-${mesParam ?? "current"}`}
               mercado={mercado}
               entries={(mercado === "delay" ? delayListRes.data : erroListRes.data) ?? []}
+            />
+          </Card>
+        </>
+      ) : isRodadas ? (
+        <>
+          <Card>
+            <h2 className="mb-4 text-lg font-semibold text-neutral-100">
+              Novo lançamento ({RODADAS_LABEL})
+            </h2>
+            <RodadaEntryForm />
+          </Card>
+
+          <Card>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-neutral-100">
+                Lançamentos de rodadas grátis de {mesLabel}
+              </h2>
+              {!isCurrentMonth && (
+                <Link href="/dashboard?aba=rodadas" className="text-sm text-emerald-400 hover:underline">
+                  Ver mês atual
+                </Link>
+              )}
+            </div>
+            <RodadasEntriesTable
+              key={`rodadas-${mesParam ?? "current"}`}
+              entries={rodadasListRes.data ?? []}
             />
           </Card>
         </>
