@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import { updateRodadaEntry, deleteRodadaEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CasaApostaSelect } from "@/components/ui/casa-aposta-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Pagination, PAGE_SIZE } from "@/components/ui/pagination";
 import { formatBRL } from "@/lib/date-helpers";
@@ -85,7 +86,7 @@ function RodadaEntryRow({ entry }: { entry: RodadaEntry }) {
         <td colSpan={8} className="py-3">
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-6">
             <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
-            <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
+            <CasaApostaSelect name="casa_aposta" defaultValue={entry.casa_aposta} required />
             <Input name="quantidade" type="number" step="1" min="0" defaultValue={entry.quantidade} />
             <Input
               name="valor_ganho"

@@ -9,6 +9,7 @@ import {
 } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CasaApostaSelect } from "@/components/ui/casa-aposta-select";
 import { Label } from "@/components/ui/label";
 import { GreenRedToggle } from "@/components/ui/green-red-toggle";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -114,7 +115,7 @@ function MarketEntryRow({ mercado, entry }: { mercado: Mercado; entry: MarketEnt
         <td colSpan={8} className="py-3">
           <form action={formAction} className="grid grid-cols-2 gap-2 sm:grid-cols-7">
             <DatePicker name="entry_date" defaultValue={entry.entry_date} required />
-            <Input name="casa_aposta" defaultValue={entry.casa_aposta} required />
+            <CasaApostaSelect name="casa_aposta" defaultValue={entry.casa_aposta} required />
             <div>
               <Label>Resultado</Label>
               <GreenRedToggle value={resultado} onChange={setResultado} />

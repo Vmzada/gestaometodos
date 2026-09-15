@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { createDelayEntry, createErroEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CasaApostaSelect, type CasaApostaSelectHandle } from "@/components/ui/casa-aposta-select";
 import { Label } from "@/components/ui/label";
 import { GreenRedToggle } from "@/components/ui/green-red-toggle";
 import { DatePicker, type DatePickerHandle } from "@/components/ui/date-picker";
@@ -29,6 +30,7 @@ export function MarketEntryForm({ mercado }: { mercado: Mercado }) {
   const [resultado, setResultado] = useState<"green" | "red">("green");
   const formRef = useRef<HTMLFormElement>(null);
   const dateRef = useRef<DatePickerHandle>(null);
+  const casaRef = useRef<CasaApostaSelectHandle>(null);
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -40,6 +42,7 @@ export function MarketEntryForm({ mercado }: { mercado: Mercado }) {
       setError(null);
       formRef.current?.reset();
       dateRef.current?.reset();
+      casaRef.current?.reset();
       setOdd(0);
       setValor(0);
       setClienteParte(0);
@@ -63,10 +66,10 @@ export function MarketEntryForm({ mercado }: { mercado: Mercado }) {
       </div>
       <div>
         <Label htmlFor={`${mercado}_casa_aposta`}>Casa de aposta</Label>
-        <Input
+        <CasaApostaSelect
+          ref={casaRef}
           id={`${mercado}_casa_aposta`}
           name="casa_aposta"
-          placeholder="Ex: Bet365"
           required
         />
       </div>

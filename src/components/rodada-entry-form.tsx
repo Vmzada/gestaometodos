@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { createRodadaEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CasaApostaSelect, type CasaApostaSelectHandle } from "@/components/ui/casa-aposta-select";
 import { Label } from "@/components/ui/label";
 import { DatePicker, type DatePickerHandle } from "@/components/ui/date-picker";
 import { formatBRL, todayISO } from "@/lib/date-helpers";
@@ -19,6 +20,7 @@ export function RodadaEntryForm() {
   const [clienteParte, setClienteParte] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
   const dateRef = useRef<DatePickerHandle>(null);
+  const casaRef = useRef<CasaApostaSelectHandle>(null);
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -30,6 +32,7 @@ export function RodadaEntryForm() {
       setError(null);
       formRef.current?.reset();
       dateRef.current?.reset();
+      casaRef.current?.reset();
       setValorGanho(0);
       setClienteParte(0);
     });
@@ -51,7 +54,7 @@ export function RodadaEntryForm() {
       </div>
       <div>
         <Label htmlFor="rodadas_casa_aposta">Casa de aposta</Label>
-        <Input id="rodadas_casa_aposta" name="casa_aposta" placeholder="Ex: Bet365" required />
+        <CasaApostaSelect ref={casaRef} id="rodadas_casa_aposta" name="casa_aposta" required />
       </div>
       <div>
         <Label htmlFor="rodadas_quantidade">Qtd. de rodadas</Label>

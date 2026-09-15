@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { createEntry } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CasaApostaSelect, type CasaApostaSelectHandle } from "@/components/ui/casa-aposta-select";
 import { Label } from "@/components/ui/label";
 import { DatePicker, type DatePickerHandle } from "@/components/ui/date-picker";
 import { formatBRL, todayISO } from "@/lib/date-helpers";
@@ -17,6 +18,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
   const [cpa, setCpa] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
   const dateRef = useRef<DatePickerHandle>(null);
+  const casaRef = useRef<CasaApostaSelectHandle>(null);
 
   function handleSubmit(formData: FormData) {
     if (readOnly) return;
@@ -29,6 +31,7 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
       setError(null);
       formRef.current?.reset();
       dateRef.current?.reset();
+      casaRef.current?.reset();
       setDeposito(0);
       setSaque(0);
       setClienteParte(0);
@@ -53,10 +56,10 @@ export function EntryForm({ readOnly = false }: { readOnly?: boolean }) {
       </div>
       <div>
         <Label htmlFor="casa_aposta">Casa de aposta</Label>
-        <Input
+        <CasaApostaSelect
+          ref={casaRef}
           id="casa_aposta"
           name="casa_aposta"
-          placeholder="Ex: Bet365"
           disabled={readOnly}
           required
         />
