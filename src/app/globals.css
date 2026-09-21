@@ -35,6 +35,13 @@ body {
   mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
 }
 
+/* Pano da mesa de cassino: verde profundo com vinheta, usado atrás do hero. */
+.bg-felt {
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(6, 78, 59, 0.55), transparent 70%),
+    radial-gradient(ellipse 100% 70% at 50% 120%, rgba(4, 47, 36, 0.8), transparent 70%);
+}
+
 .text-glow {
   text-shadow: 0 0 40px rgba(16, 185, 129, 0.35);
 }
@@ -43,6 +50,35 @@ body {
   perspective: 1200px;
 }
 
+/* ---------------------------------------------------------------------------
+ * Cena 3D
+ *
+ * Tudo aqui é CSS 3D puro (transform-style: preserve-3d), sem biblioteca: a
+ * landing é a primeira tela do site e carregar WebGL só pela estética custaria
+ * mais do que a cena inteira entrega.
+ * ------------------------------------------------------------------------ */
+
+/* Palco: perspectiva curta = profundidade mais dramática que a do hero antigo. */
+.scene {
+  perspective: 900px;
+  perspective-origin: 50% 40%;
+}
+
+.scene-flat {
+  perspective: 1600px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Inclinação de "carta na mesa" — o eixo X joga o topo pra trás. */
+.tilt-table {
+  transform: rotateX(18deg) rotateZ(-2deg);
+}
+
+/* ---- Animações ----------------------------------------------------------- */
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }
@@ -50,4 +86,88 @@ body {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Flutuação com deslocamento em Z: o item "vem pra frente" no meio do ciclo. */
+@keyframes float-3d {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg); }
+  50% { transform: translate3d(0, -18px, 40px) rotateX(-4deg) rotateY(4deg); }
+}
+
+.animate-float-3d {
+  animation: float-3d 9s ease-in-out infinite;
+}
+
+/* Virada do bilhete quando ele troca de casa: entra girando de lado e de trás. */
+@keyframes flip-in {
+  from { opacity: 0; transform: rotateY(-38deg) translateZ(-70px); }
+  to { opacity: 1; transform: rotateY(0deg) translateZ(0); }
+}
+
+.animate-flip-in {
+  animation: flip-in 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* Esteira infinita: a faixa é duplicada no JSX, então -50% reinicia sem salto. */
+@keyframes marquee-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 40s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 50s linear infinite;
+}
+
+/* Brilho verde pulsante do selo de GREEN. */
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+  50% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2.6s ease-out infinite;
+}
+
+/* Reflexo que atravessa o bilhete, como luz passando num cartão. */
+@keyframes sheen {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  55%, 100% { transform: translateX(260%) skewX(-18deg); }
+}
+
+.animate-sheen {
+  animation: sheen 5.5s ease-in-out infinite;
+}
+
+/* Contagem sutil de subida, pros números de lucro. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-rise-in {
+  animation: rise-in 0.6s ease-out both;
+}
+
+/* Quem pediu menos movimento recebe a cena parada — as peças 3D continuam
+ * posicionadas, só não animam. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-3d,
+  .animate-flip-in,
+  .animate-marquee-left,
+  .animate-marquee-right,
+  .animate-pulse-green,
+  .animate-sheen,
+  .animate-rise-in {
+    animation: none;
+  }
 }
